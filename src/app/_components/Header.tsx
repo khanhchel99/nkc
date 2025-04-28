@@ -103,7 +103,7 @@ export default function Header({ session, darkMode = false }: { session: any, da
               {session ? (
                 <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>PROFILE</Link>
               ) : (
-                <Link href="/api/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SIGN IN</Link>
+                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SIGN IN</Link>
               )}
               <Link href="/quote" className="bg-[#895D35] text-white px-6 py-2 font-medium hover:bg-[#7A4F2A] flex items-center">
                 Get A Quote
@@ -126,7 +126,7 @@ export default function Header({ session, darkMode = false }: { session: any, da
               {session ? (
                 <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>PROFILE</Link>
               ) : (
-                <Link href="/api/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SIGN IN</Link>
+                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SIGN IN</Link>
               )}
               <Link href="/quote" className="bg-[#895D35] text-white px-6 py-2 font-medium hover:bg-[#7A4F2A] flex items-center w-fit">
                 Get A Quote
