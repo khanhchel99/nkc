@@ -4,7 +4,15 @@ import { db } from "@/server/db";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, mobile, service, note } = await req.json();
+    const formData = await req.formData();
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const mobile = formData.get("mobile") as string;
+    const service = formData.get("service") as string;
+    const note = formData.get("note") as string | null;
+    const companyName = formData.get("companyName") as string | null;
+    const attachmentFile = formData.get("attachment") as File | null;
+    let attachmentUrl: string | null = null;
 
     // Validate required fields
     if (!name || !email || !mobile || !service) {
@@ -12,6 +20,12 @@ export async function POST(req: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    // Handle attachment upload (optional, here just save filename if present)
+    if (attachmentFile && typeof attachmentFile.name === "string") {
+      // In production, upload to S3 or similar and save the URL
+      attachmentUrl = attachmentFile.name;
     }
 
     // Save to database
@@ -22,6 +36,8 @@ export async function POST(req: Request) {
         mobile,
         service,
         note: note || "",
+        companyName: companyName || undefined,
+        attachment: attachmentUrl,
       },
     });
 
@@ -47,9 +63,22 @@ export async function POST(req: Request) {
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Mobile:</strong> ${mobile}</p>
         <p><strong>Service:</strong> ${service}</p>
+        <p><strong>Company Name:</strong> ${companyName || "-"}</p>
         <p><strong>Note:</strong> ${note || "No additional notes"}</p>
+        <p><strong>Attachment:</strong> ${
+          attachmentFile ? attachmentFile.name : "None"
+        }</p>
         <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
       `,
+      attachments: attachmentFile
+        ? [
+            {
+              filename: attachmentFile.name,
+              content: Buffer.from(await attachmentFile.arrayBuffer()),
+              contentType: attachmentFile.type || undefined,
+            },
+          ]
+        : [],
     };
 
     // Send email

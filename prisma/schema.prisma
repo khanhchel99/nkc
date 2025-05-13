@@ -70,6 +70,8 @@ model InquiryForm {
   mobile    String
   service   String
   note      String?
+  companyName String?
+  attachment  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
