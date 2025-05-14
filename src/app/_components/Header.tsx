@@ -25,8 +25,8 @@ export default function Header({ session, darkMode = false }: { session: any, da
     <>
       {/* Top contact bar */}
       <div className={darkMode ? "bg-black text-white py-2 text-sm" : "bg-stone-100 py-2 text-sm"}>
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex flex-col md:flex-row md:items-center">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center md:items-center">
+          <div className="flex flex-col md:flex-row md:items-center w-full md:w-auto">
             <div className="flex items-center mr-6 mb-1 md:mb-0">
               <svg xmlns="http://www.w3.org/2000/svg" className={darkMode ? "h-4 w-4 mr-1 text-white" : "h-4 w-4 mr-1 text-[#895D35]"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -34,20 +34,20 @@ export default function Header({ session, darkMode = false }: { session: any, da
               </svg>
               <span>{t("address_bar_location")}</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center md:ml-6">
               <svg xmlns="http://www.w3.org/2000/svg" className={darkMode ? "h-4 w-4 mr-1 text-white" : "h-4 w-4 mr-1 text-[#895D35]"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{t("address_bar_hours")}</span>
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
+            <div className="flex items-center md:ml-6 mt-1 md:mt-0 w-full md:w-auto">
               <svg xmlns="http://www.w3.org/2000/svg" className={darkMode ? "h-4 w-4 mr-1 text-white" : "h-4 w-4 mr-1 text-[#895D35]"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               <span>{t("address_bar_phone")}</span>
             </div>
+          </div>
+          <div className="flex items-center space-x-4">
             <div className="hidden md:flex space-x-3">
               <a href="#" className={darkMode ? "hover:text-[#FFD700] text-white" : "hover:text-[#895D35]"}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,12 @@ export default function Header({ session, darkMode = false }: { session: any, da
               {session ? (
                 <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("profile")}</Link>
               ) : (
-                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("sign_in")}</Link>
+                <Link href="/auth/signin" className="border border-[#895D35] text-[#895D35] px-5 py-2 rounded font-semibold hover:bg-[#895D35] hover:text-white transition flex items-center gap-2 bg-transparent">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H3m6-6v12m6-6a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {t("sign_in")}
+                </Link>
               )}
               <Link href="/quote" className="bg-[#895D35] text-white px-6 py-2 font-medium hover:bg-[#7A4F2A] flex items-center">
                 {t("get_a_quote")}
@@ -130,7 +135,12 @@ export default function Header({ session, darkMode = false }: { session: any, da
               {session ? (
                 <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("profile")}</Link>
               ) : (
-                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("sign_in")}</Link>
+                <Link href="/auth/signin" className="border border-[#895D35] text-[#895D35] px-5 py-2 rounded font-semibold hover:bg-[#895D35] hover:text-white transition flex items-center gap-2 bg-transparent">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H3m6-6v12m6-6a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {t("sign_in")}
+                </Link>
               )}
               <Link href="/quote" className="bg-[#895D35] text-white px-6 py-2 font-medium hover:bg-[#7A4F2A] flex items-center w-fit">
                 {t("get_a_quote")}

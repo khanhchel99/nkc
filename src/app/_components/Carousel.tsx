@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useI18n } from "../i18n";
 
 interface CarouselSlide {
   title: string;
@@ -17,39 +18,39 @@ interface CarouselSlide {
 
 export default function Carousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { t } = useI18n();
 
   const slides: CarouselSlide[] = [
     {
-      title: "WELCOME TO WOODY",
-      subtitle: "Best Carpenter & Craftsman Services",
-      description:
-        "Vero elitr justo clita lorem. Ipsum dolor at sed stet sit diam no. Kasd rebum ipsum et diam justo clita et kasd rebum sea elitr.",
+      title: t("carousel_title_1"),
+      subtitle: t("carousel_subtitle_1"),
+      description: t("carousel_desc_1"),
       image: "/images/business-slide1.jpg",
-      buttonText1: "Read More",
+      buttonText1: t("carousel_btn1_1"),
       buttonLink1: "/about",
-      buttonText2: "Free Quote",
+      buttonText2: t("carousel_btn2_1"),
       buttonLink2: "/quote",
     },
     {
-      title: "EXPERT CONSULTING",
-      subtitle: "Strategic Business Solutions",
-      description: "Our team of experienced consultants provide expert guidance to optimize your business operations.",
+      title: t("carousel_title_2"),
+      subtitle: t("carousel_subtitle_2"),
+      description: t("carousel_desc_2"),
       image: "/images/business-slide2.jpg",
-      buttonText1: "Our Services",
+      buttonText1: t("carousel_btn1_2"),
       buttonLink1: "/services",
-      buttonText2: "Contact Us",
+      buttonText2: t("carousel_btn2_2"),
       buttonLink2: "/contact",
     },
     {
-      title: "GROW YOUR BUSINESS",
-      subtitle: "Innovative Strategies",
-      description: "Partner with us to implement cutting-edge strategies that drive sustainable growth.",
+      title: t("carousel_title_3"),
+      subtitle: t("carousel_subtitle_3"),
+      description: t("carousel_desc_3"),
       image: "/images/business-slide3.jpg",
-      buttonText1: "Learn More",
+      buttonText1: t("carousel_btn1_3"),
       buttonLink1: "/services",
-      buttonText2: "Get Started",
+      buttonText2: t("carousel_btn2_3"),
       buttonLink2: "/contact",
-    }
+    },
   ];
 
   useEffect(() => {
