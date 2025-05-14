@@ -47,27 +47,51 @@ export default function AboutPage() {
           <div className="mb-0">
             <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-6 font-serif">OUR HISTORY</h2>
             <div className="relative mb-8 pt-4">
-              {/* Timeline line */}
-              <div className="absolute left-0 right-0 top-7 h-0.5 bg-[#895D35]/30 z-0" style={{marginLeft: '2%', marginRight: '2%'}} />
+              {/* Years row */}
               <div className="flex justify-between items-end text-[#895D35] font-semibold text-lg mb-0 relative z-10">
                 <div className="flex flex-col items-center w-1/4">
                   <span className="mb-2">2010</span>
-                  <div className="w-3 h-3 bg-[#895D35] rounded-full mb-2" />
-                  <span className="text-sm text-gray-600 text-center">Company founded</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
                   <span className="mb-2">2013</span>
-                  <div className="w-3 h-3 bg-[#895D35] rounded-full mb-2" />
-                  <span className="text-sm text-gray-600 text-center">Opened our first workshop</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
                   <span className="mb-2">2017</span>
-                  <div className="w-3 h-3 bg-[#895D35] rounded-full mb-2" />
-                  <span className="text-sm text-gray-600 text-center">Launched our flagship showroom</span>
                 </div>
                 <div className="flex flex-col items-center w-1/4">
                   <span className="mb-2">2022</span>
-                  <div className="w-3 h-3 bg-[#895D35] rounded-full mb-2" />
+                </div>
+              </div>
+              {/* Timeline line with dots absolutely positioned */}
+              <div className="relative" style={{height: '24px'}}>
+                <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-[#895D35]/30 z-0" style={{marginLeft: '2%', marginRight: '2%', transform: 'translateY(-50%)'}} />
+                <div className="flex justify-between items-center absolute left-0 right-0 top-1/2 w-full" style={{transform: 'translateY(-50%)'}}>
+                  <div className="flex justify-center w-1/4">
+                    <div className="w-3 h-3 bg-[#895D35] rounded-full z-10" />
+                  </div>
+                  <div className="flex justify-center w-1/4">
+                    <div className="w-3 h-3 bg-[#895D35] rounded-full z-10" />
+                  </div>
+                  <div className="flex justify-center w-1/4">
+                    <div className="w-3 h-3 bg-[#895D35] rounded-full z-10" />
+                  </div>
+                  <div className="flex justify-center w-1/4">
+                    <div className="w-3 h-3 bg-[#895D35] rounded-full z-10" />
+                  </div>
+                </div>
+              </div>
+              {/* Descriptions row */}
+              <div className="flex justify-between items-start text-[#895D35] font-semibold text-lg mb-0 relative z-10 mt-2">
+                <div className="flex flex-col items-center w-1/4">
+                  <span className="text-sm text-gray-600 text-center">Company founded</span>
+                </div>
+                <div className="flex flex-col items-center w-1/4">
+                  <span className="text-sm text-gray-600 text-center">Opened our first workshop</span>
+                </div>
+                <div className="flex flex-col items-center w-1/4">
+                  <span className="text-sm text-gray-600 text-center">Launched our flagship showroom</span>
+                </div>
+                <div className="flex flex-col items-center w-1/4">
                   <span className="text-sm text-gray-600 text-center">Expanded to a larger production facility</span>
                 </div>
               </div>
