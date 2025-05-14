@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/trpc/react";
+import { useI18n } from "../../i18n";
 
 export default function EditProfile() {
+  const { t } = useI18n();
   const router = useRouter();
   const { data: user, isLoading } = api.user.getCurrentUser.useQuery();
   
@@ -60,23 +62,21 @@ export default function EditProfile() {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
           <div className="bg-amber-50 rounded-lg shadow-md p-8 text-center">
-            <p className="text-[#895D35]">Loading profile data...</p>
+            <p className="text-[#895D35]">{t('loading_profile')}</p>
           </div>
         </div>
       </div>
     );
   }
-
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-md mx-auto">
         <div className="bg-amber-50 rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold mb-6 text-[#895D35]">Edit Profile</h1>
-          
+          <h1 className="text-3xl font-bold mb-6 text-[#895D35]">{t('edit_profile')}</h1>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-[#895D35] mb-1">
-                Name
+                {t('name')}
               </label>
               <input
                 type="text"
@@ -87,10 +87,9 @@ export default function EditProfile() {
                 className="w-full px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#895D35]"
               />
             </div>
-            
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-[#895D35] mb-1">
-                Title / Position
+                {t('title_position')}
               </label>
               <input
                 type="text"
@@ -101,10 +100,9 @@ export default function EditProfile() {
                 className="w-full px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#895D35]"
               />
             </div>
-            
             <div>
               <label htmlFor="company" className="block text-sm font-medium text-[#895D35] mb-1">
-                Company
+                {t('company')}
               </label>
               <input
                 type="text"
@@ -115,10 +113,9 @@ export default function EditProfile() {
                 className="w-full px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#895D35]"
               />
             </div>
-            
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-[#895D35] mb-1">
-                Phone
+                {t('phone')}
               </label>
               <input
                 type="text"
@@ -129,20 +126,16 @@ export default function EditProfile() {
                 className="w-full px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#895D35]"
               />
             </div>
-            
             <div className="flex justify-between pt-4">
-              <Link
-                href="/"
-                className="px-4 py-2 border border-[#895D35] text-[#895D35] rounded hover:bg-amber-100"
-              >
-                Cancel
+              <Link href="/" className="px-4 py-2 border border-[#895D35] text-[#895D35] rounded hover:bg-amber-100">
+                {t('cancel')}
               </Link>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-[#895D35] text-white rounded hover:bg-[#7A4F2A] disabled:opacity-50"
               >
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? t('saving') : t('save_changes')}
               </button>
             </div>
           </form>

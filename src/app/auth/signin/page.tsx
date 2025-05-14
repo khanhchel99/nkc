@@ -1,15 +1,19 @@
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
+import { useI18n } from '../../i18n';
 
 const SignInPage = () => {
+  const { t } = useI18n();
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800">Sign In</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800">{t('sign_in')}</h2>
         <form className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email address
+              {t('email_address')}
             </label>
             <input
               type="email"
@@ -21,7 +25,7 @@ const SignInPage = () => {
           </div>
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
+              {t('password')}
             </label>
             <input
               type="password"
@@ -35,13 +39,13 @@ const SignInPage = () => {
             type="submit"
             className="w-full px-4 py-2 text-white bg-[#895D35] rounded-md hover:bg-[#7A4F2A] focus:outline-none focus:ring-2 focus:ring-[#7A4F2A] focus:ring-offset-2"
           >
-            Sign In
+            {t('sign_in')}
           </button>
         </form>
         <p className="text-sm text-center text-gray-600">
-          Don’t have an account?{' '}
+          {t('no_account')}{' '}
           <Link href="/auth/signup" className="text-blue-600 hover:underline">
-            Sign up
+            {t('sign_up')}
           </Link>
         </p>
       </div>

@@ -1,7 +1,10 @@
+"use client";
 import Image from 'next/image';
 import Link from 'next/link';
+import { useI18n } from '../i18n';
 
 export default function AboutPage() {
+  const { t } = useI18n();
   return (
     <>
       <section className="relative h-64 md:h-80 flex items-center bg-gray-900">
@@ -14,13 +17,13 @@ export default function AboutPage() {
           priority
         />
         <div className="relative z-10 flex flex-col items-start px-8 md:px-24 w-full max-w-5xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 text-left">About Us</h1>
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 text-left">{t('about')}</h1>
           <nav className="text-white text-lg flex items-center space-x-2 text-left">
-            <Link href="/" className="hover:underline">Home</Link>
+            <Link href="/" className="hover:underline">{t('home') || 'Home'}</Link>
             <span>/</span>
-            <span>Pages</span>
+            <span>{t('pages') || 'Pages'}</span>
             <span>/</span>
-            <span className="font-semibold">About</span>
+            <span className="font-semibold">{t('about')}</span>
           </nav>
         </div>
       </section>
@@ -31,7 +34,7 @@ export default function AboutPage() {
           {/* Our Story */}
           <div className="mb-0 grid md:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-4 font-serif">OUR STORY</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-4 font-serif">{t('story') || 'OUR STORY'}</h2>
               <p className="text-gray-700 text-lg leading-relaxed font-sans">
                 Founded with a passion for craftsmanship and a commitment to quality, our furniture company has been creating beautiful, timeless pieces for over a decade.
               </p>
@@ -45,7 +48,7 @@ export default function AboutPage() {
 
           {/* Our History */}
           <div className="mb-0">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-6 font-serif">OUR HISTORY</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-6 font-serif">{t('history') || 'OUR HISTORY'}</h2>
             <div className="relative mb-8 pt-4">
               {/* Years row */}
               <div className="flex justify-between items-end text-[#895D35] font-semibold text-lg mb-0 relative z-10">
@@ -100,7 +103,7 @@ export default function AboutPage() {
 
           {/* Our Team */}
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-8 font-serif">OUR TEAM</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-8 font-serif">{t('team') || 'OUR TEAM'}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="flex flex-col items-center">
                 <div className="w-32 h-40 bg-gray-200 rounded-md overflow-hidden mb-3">

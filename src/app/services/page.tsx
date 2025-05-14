@@ -1,53 +1,51 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import InquiryForm from "../_components/InquiryForm";
+import { useI18n } from "../i18n";
 
 const services = [
 	{
-		title: "General Carpentry",
-		description:
-			"Set stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.",
+		title: "general_carpentry",
+		description: "general_carpentry_desc",
 		image: "/images/business-slide1.jpg",
 		link: "/services/general-carpentry",
 	},
 	{
-		title: "Furniture Manufacturing",
-		description:
-			"Set stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.",
+		title: "furniture_manufacturing",
+		description: "furniture_manufacturing_desc",
 		image: "/images/business-slide2.jpg",
 		link: "/services/furniture-manufacturing",
 	},
 	{
-		title: "Furniture Remodeling",
-		description:
-			"Set stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.",
+		title: "furniture_remodeling",
+		description: "furniture_remodeling_desc",
 		image: "/images/business-slide3.jpg",
 		link: "/services/furniture-remodeling",
 	},
 	{
-		title: "Wooden Floor",
-		description:
-			"Set stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.",
+		title: "wooden_floor",
+		description: "wooden_floor_desc",
 		image: "/images/business-slide1.jpg",
 		link: "/services/wooden-floor",
 	},
 	{
-		title: "Wooden Furniture",
-		description:
-			"Set stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.",
+		title: "wooden_furniture",
+		description: "wooden_furniture_desc",
 		image: "/images/business-slide2.jpg",
 		link: "/services/wooden-furniture",
 	},
 	{
-		title: "Custom Work",
-		description:
-			"Set stet justo dolor sed duo. Ut clita sea sit ipsum diam lorem diam.",
+		title: "custom_work",
+		description: "custom_work_desc",
 		image: "/images/business-slide3.jpg",
 		link: "/services/custom-work",
 	},
 ];
 
 export default function ServicesPage() {
+	const { t } = useI18n();
 	return (
 		<main className="min-h-screen">
 			<section className="relative h-64 md:h-80 flex items-center bg-gray-900">
@@ -61,22 +59,22 @@ export default function ServicesPage() {
 				/>
 				<div className="relative z-10 flex flex-col items-start px-8 md:px-24 w-full max-w-5xl mx-auto">
 					<h1 className="text-4xl md:text-6xl font-bold text-white mb-4 text-left">
-						Services
+						{t("services")}
 					</h1>
 					<nav className="text-white text-lg flex items-center space-x-2 text-left">
 						<Link href="/" className="hover:underline">
-							Home
+							{t("home")}
 						</Link>
 						<span>/</span>
-						<span>Pages</span>
+						<span>{t("pages")}</span>
 						<span>/</span>
-						<span className="font-semibold">Services</span>
+						<span className="font-semibold">{t("services")}</span>
 					</nav>
 				</div>
 			</section>
 			<div className="container mx-auto py-12 px-4">
 				<h2 className="text-3xl font-bold text-center mb-8">
-					Our Services
+					{t("our_services")}
 				</h2>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 					{services.map((service, index) => (
@@ -86,30 +84,30 @@ export default function ServicesPage() {
 						>
 							<Image
 								src={service.image}
-								alt={service.title}
+								alt={t(service.title)}
 								width={400}
 								height={300}
 								className="w-full h-48 object-cover"
 							/>
 							<div className="p-4">
 								<h3 className="text-xl font-semibold mb-2">
-									{service.title}
+									{t(service.title)}
 								</h3>
 								<p className="text-gray-600 mb-4">
-									{service.description}
+									{t(service.description)}
 								</p>
 								<a
 									href={service.link}
 									className="text-blue-500 hover:underline font-medium"
 								>
-									Read More &rarr;
+									{t("read_more")} &rarr;
 								</a>
 							</div>
 						</div>
 					))}
 				</div>
 			</div>
-			
+
 			{/* Free Quote Section */}
 			<section className="bg-gray-100 py-16">
 				<div className="container mx-auto px-4">
@@ -124,14 +122,17 @@ export default function ServicesPage() {
 							/>
 						</div>
 						<div className="bg-white p-8 rounded-lg shadow-md">
-							<h2 className="text-3xl font-bold mb-2">Free Quote</h2>
-							<div className="h-1 w-16 mb-6" style={{ backgroundColor: "#7A4F2A" }}></div>
+							<h2 className="text-3xl font-bold mb-2">
+								{t("free_quote")}
+							</h2>
+							<div
+								className="h-1 w-16 mb-6"
+								style={{ backgroundColor: "#7A4F2A" }}
+							></div>
 							<p className="text-gray-600 mb-8">
-								Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet
-								diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo erat
-								amet
+								{t("free_quote_desc")}
 							</p>
-							
+
 							<InquiryForm />
 						</div>
 					</div>

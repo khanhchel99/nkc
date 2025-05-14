@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header({ session, darkMode = false }: { session: any, darkMode?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -67,6 +68,7 @@ export default function Header({ session, darkMode = false }: { session: any, da
                 </svg>
               </a>
             </div>
+            <LanguageSwitcher />
           </div>
         </div>
       </div>
