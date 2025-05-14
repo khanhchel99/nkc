@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useI18n } from "../i18n";
 
 export default function Header({ session, darkMode = false }: { session: any, darkMode?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useI18n();
 
   // Close menu when window is resized to desktop size
   useEffect(() => {
@@ -30,13 +32,13 @@ export default function Header({ session, darkMode = false }: { session: any, da
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>Dong van Industrial Zone, Duy Tien District, Hanam province, Vietnam</span>
+              <span>{t("address_bar_location")}</span>
             </div>
             <div className="flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className={darkMode ? "h-4 w-4 mr-1 text-white" : "h-4 w-4 mr-1 text-[#895D35]"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Mon - Fri : 08.00 AM - 06.00 PM GMT+7</span>
+              <span>{t("address_bar_hours")}</span>
             </div>
           </div>
           <div className="flex items-center space-x-4">
@@ -44,7 +46,7 @@ export default function Header({ session, darkMode = false }: { session: any, da
               <svg xmlns="http://www.w3.org/2000/svg" className={darkMode ? "h-4 w-4 mr-1 text-white" : "h-4 w-4 mr-1 text-[#895D35]"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              <span>+84 917 888 689</span>
+              <span>{t("address_bar_phone")}</span>
             </div>
             <div className="hidden md:flex space-x-3">
               <a href="#" className={darkMode ? "hover:text-[#FFD700] text-white" : "hover:text-[#895D35]"}>
@@ -96,19 +98,19 @@ export default function Header({ session, darkMode = false }: { session: any, da
             
             {/* Desktop navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link href="/" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>HOME</Link>
-              <Link href="/about" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>ABOUT</Link>
-              <Link href="/services" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SERVICES</Link>
-              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>PROJECTS</Link>
-              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>TEAM</Link>
-              <Link href="/contact" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>CONTACT</Link>
+              <Link href="/" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("home")}</Link>
+              <Link href="/about" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("about")}</Link>
+              <Link href="/services" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("services")}</Link>
+              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("projects")}</Link>
+              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("team")}</Link>
+              <Link href="/contact" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("contact")}</Link>
               {session ? (
-                <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>PROFILE</Link>
+                <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("profile")}</Link>
               ) : (
-                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SIGN IN</Link>
+                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("sign_in")}</Link>
               )}
               <Link href="/quote" className="bg-[#895D35] text-white px-6 py-2 font-medium hover:bg-[#7A4F2A] flex items-center">
-                Get A Quote
+                {t("get_a_quote")}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -119,19 +121,19 @@ export default function Header({ session, darkMode = false }: { session: any, da
           {/* Mobile navigation */}
           <div className={`md:hidden ${menuOpen ? 'block' : 'hidden'} mt-4 pt-4 border-t`}>
             <nav className="flex flex-col space-y-4">
-              <Link href="/" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>HOME</Link>
-              <Link href="/about" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>ABOUT</Link>
-              <Link href="/services" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SERVICES</Link>
-              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>PROJECTS</Link>
-              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>TEAM</Link>
-              <Link href="/contact" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>CONTACT</Link>
+              <Link href="/" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("home")}</Link>
+              <Link href="/about" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("about")}</Link>
+              <Link href="/services" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("services")}</Link>
+              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("projects")}</Link>
+              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("team")}</Link>
+              <Link href="/contact" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("contact")}</Link>
               {session ? (
-                <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>PROFILE</Link>
+                <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("profile")}</Link>
               ) : (
-                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>SIGN IN</Link>
+                <Link href="/auth/signin" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("sign_in")}</Link>
               )}
               <Link href="/quote" className="bg-[#895D35] text-white px-6 py-2 font-medium hover:bg-[#7A4F2A] flex items-center w-fit">
-                Get A Quote
+                {t("get_a_quote")}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
