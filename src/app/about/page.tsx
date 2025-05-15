@@ -101,9 +101,9 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Our Team */}
+          {/* Manufacturing */}
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-8 font-serif">{t('team') || 'OUR TEAM'}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-8 font-serif">{t('manufacturing') || 'MANUFACTURING'}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="flex flex-col items-center">
                 <div className="w-32 h-40 bg-gray-200 rounded-md overflow-hidden mb-3">

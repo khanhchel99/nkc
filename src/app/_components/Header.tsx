@@ -101,8 +101,8 @@ export default function Header({ session, darkMode = false }: { session: any, da
               <Link href="/" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("home")}</Link>
               <Link href="/about" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("about")}</Link>
               <Link href="/services" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("services")}</Link>
-              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("projects")}</Link>
-              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("team")}</Link>
+              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("catalogue")}</Link>
+              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("manufacturing")}</Link>
               <Link href="/contact" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("contact")}</Link>
               {session ? (
                 <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("profile")}</Link>
@@ -129,8 +129,8 @@ export default function Header({ session, darkMode = false }: { session: any, da
               <Link href="/" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("home")}</Link>
               <Link href="/about" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("about")}</Link>
               <Link href="/services" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("services")}</Link>
-              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("projects")}</Link>
-              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("team")}</Link>
+              <Link href="/projects" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("catalogue")}</Link>
+              <Link href="/team" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("manufacturing")}</Link>
               <Link href="/contact" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("contact")}</Link>
               {session ? (
                 <Link href="/profile" className={darkMode ? "font-medium hover:text-[#FFD700] text-white" : "font-medium hover:text-[#895D35]"}>{t("profile")}</Link>

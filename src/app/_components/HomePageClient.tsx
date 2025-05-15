@@ -114,9 +114,8 @@ export function HomePageClient({ session }: { session: Session | null }) {
                 {t("learn_more")}
               </Link>
             </div>
-            <div className="bg-amber-200 h-96 rounded-lg relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-semibold text-[#895D35]">{t("our_team")}</span>
+            <div className="bg-amber-200 h-96 rounded-lg relative">              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-semibold text-[#895D35]">{t("manufacturing")}</span>
               </div>
             </div>
           </div>
