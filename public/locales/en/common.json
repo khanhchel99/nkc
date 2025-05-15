@@ -117,5 +117,20 @@
   "carousel_subtitle_3": "Innovative Strategies",
   "carousel_desc_3": "Partner with us to implement cutting-edge strategies that drive sustainable growth.",
   "carousel_btn1_3": "Learn More",
-  "carousel_btn2_3": "Get Started"
+  "carousel_btn2_3": "Get Started",
+  "contact_us": "Contact Us",
+  "company_info": "Company Information",
+  "company_name": "Company Name",
+  "address": "Address",
+  "phone": "Phone",
+  "email": "Email",
+  "working_hours": "Working Hours",
+  "send_us_a_message": "Send Us a Message",
+  "your_name": "Your Name",
+  "your_email": "Your Email",
+  "your_company": "Your Company (optional)",
+  "your_phone": "Your Phone (optional)",
+  "your_message": "Your Message",
+  "send_message": "Send Message",
+  "find_us": "Find Us"
 }

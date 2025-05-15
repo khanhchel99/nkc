@@ -48,7 +48,7 @@ export default function ServicesPage() {
 	const { t } = useI18n();
 	return (
 		<main className="min-h-screen">
-			<section className="relative h-64 md:h-80 flex items-center bg-gray-900">
+			<section className="relative h-48 md:h-60 flex items-center bg-gray-900">
 				<Image
 					src="/images/business-slide2.jpg"
 					alt="Services Background"
