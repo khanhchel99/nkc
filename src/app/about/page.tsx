@@ -18,13 +18,6 @@ export default function AboutPage() {
         />
         <div className="relative z-10 flex flex-col items-start px-8 md:px-24 w-full max-w-5xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 text-left">{t('about')}</h1>
-          <nav className="text-white text-lg flex items-center space-x-2 text-left">
-            <Link href="/" className="hover:underline">{t('home') || 'Home'}</Link>
-            <span>/</span>
-            <span>{t('pages') || 'Pages'}</span>
-            <span>/</span>
-            <span className="font-semibold">{t('about')}</span>
-          </nav>
         </div>
       </section>
 
@@ -101,9 +94,9 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Manufacturing */}
+          {/* Our Team */}
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-8 font-serif">{t('manufacturing') || 'MANUFACTURING'}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#895D35] mb-8 font-serif">{t('our_team') || 'OUR TEAM'}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="flex flex-col items-center">
                 <div className="w-32 h-40 bg-gray-200 rounded-md overflow-hidden mb-3">

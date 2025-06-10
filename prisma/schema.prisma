@@ -75,3 +75,37 @@ model InquiryForm {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String
+  longDescription String?
+  price           Decimal  @db.Decimal(10, 2)
+  originalPrice   Decimal? @db.Decimal(10, 2)
+  images          String[] // Array of image URLs
+  room            String   // Living Room, Bedroom, Kitchen, Office
+  type            String   // Sofa, Table, Chair, Bed, Cabinet
+  combo           String?  // Living Room Set, Bedroom Combo, Dining Set
+  category        String
+  inStock         Boolean  @default(true)
+  featured        Boolean  @default(false)
+  
+  // Specifications stored as JSON
+  specifications  Json?
+  features        String[] // Array of feature strings
+  
+  // SEO and metadata
+  metaTitle       String?
+  metaDescription String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([room])
+  @@index([type])
+  @@index([combo])
+  @@index([featured])
+  @@index([inStock])
+}

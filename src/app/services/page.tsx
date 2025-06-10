@@ -61,15 +61,6 @@ export default function ServicesPage() {
 					<h1 className="text-4xl md:text-6xl font-bold text-white mb-4 text-left">
 						{t("services")}
 					</h1>
-					<nav className="text-white text-lg flex items-center space-x-2 text-left">
-						<Link href="/" className="hover:underline">
-							{t("home")}
-						</Link>
-						<span>/</span>
-						<span>{t("pages")}</span>
-						<span>/</span>
-						<span className="font-semibold">{t("services")}</span>
-					</nav>
 				</div>
 			</section>
 			<div className="container mx-auto py-12 px-4">
