@@ -2,79 +2,60 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-// Mock data for demonstration
-const ROOM_TYPES = ["Living Room", "Bedroom", "Kitchen", "Office"];
-const FURNITURE_TYPES = ["Sofa", "Table", "Chair", "Bed", "Cabinet"];
-const FURNITURE_COMBOS = ["Living Room Set", "Bedroom Combo", "Dining Set"];
-
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Classic Sofa",
-    image: "/images/business-slide1.jpg",
-    room: "Living Room",
-    type: "Sofa",
-    combo: "Living Room Set",
-    price: "$499",
-  },
-  {
-    id: 2,
-    name: "Modern Bed",
-    image: "/images/business-slide2.jpg",
-    room: "Bedroom",
-    type: "Bed",
-    combo: "Bedroom Combo",
-    price: "$799",
-  },
-  {
-    id: 3,
-    name: "Dining Table",
-    image: "/images/business-slide3.jpg",
-    room: "Kitchen",
-    type: "Table",
-    combo: "Dining Set",
-    price: "$599",
-  },
-  {
-    id: 4,
-    name: "Office Chair",
-    image: "/images/business-slide1.jpg",
-    room: "Office",
-    type: "Chair",
-    combo: "",
-    price: "$299",
-  },
-  {
-    id: 5,
-    name: "Wardrobe",
-    image: "/images/business-slide2.jpg",
-    room: "Bedroom",
-    type: "Cabinet",
-    combo: "Bedroom Combo",
-    price: "$899",
-  },
-  {
-    id: 6,
-    name: "Coffee Table",
-    image: "/images/business-slide3.jpg",
-    room: "Living Room",
-    type: "Table",
-    combo: "Living Room Set",
-    price: "$299",
-  },
-];
+import { api } from "@/trpc/react";
+import { useI18n } from "../i18n";
 
 export default function CataloguePage() {
-  const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedRooms, setSelectedRooms] = useState<string[]>([]);  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedCombos, setSelectedCombos] = useState<string[]>([]);
+  const { locale, t } = useI18n();
 
+  // Translation helper functions
+  const translateRoomType = (room: string) => {
+    const roomMap: Record<string, string> = {
+      'Living Room': t("living_room"),
+      'Bedroom': t("bedroom"),
+      'Kitchen': t("kitchen"),
+      'Office': t("office"),
+      'Dining Room': t("dining_room")
+    };
+    return roomMap[room] || room;
+  };
+
+  const translateFurnitureType = (type: string) => {
+    const typeMap: Record<string, string> = {
+      'Sofa': t("sofa"),
+      'Bed': t("bed"),
+      'Table': t("table"),
+      'Chair': t("chair"),
+      'Cabinet': t("cabinet"),
+      'Desk': t("desk")
+    };
+    return typeMap[type] || type;
+  };
+
+  const translateComboType = (combo: string) => {
+    const comboMap: Record<string, string> = {
+      'Dining Set': t("dining_set"),
+      'Bedroom Combo': t("bedroom_combo"),
+      'Living Room Set': t("living_room_set"),
+      'Office Set': t("office_set")
+    };
+    return comboMap[combo] || combo;
+  };
+
+  // Fetch data from database using TRPC with current locale
+  const { data: products = [], isLoading: productsLoading } = api.product.getAll.useQuery({ locale });
+  const { data: roomTypes = [], isLoading: roomTypesLoading } = api.product.getRoomTypes.useQuery();
+  const { data: furnitureTypes = [], isLoading: furnitureTypesLoading } = api.product.getFurnitureTypes.useQuery();
+
+  // Extract furniture combos from products
+  const furnitureCombos = Array.from(new Set(products.map((p: any) => p.combo).filter(Boolean)));
   // Filtering logic
-  const filteredProducts = PRODUCTS.filter((p) => {
+  const filteredProducts = products.filter((p: any) => {
     const roomMatch = selectedRooms.length === 0 || selectedRooms.includes(p.room);
     const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(p.type);
-    const comboMatch = selectedCombos.length === 0 || selectedCombos.includes(p.combo);
+    const comboMatch = selectedCombos.length === 0 || (p.combo && selectedCombos.includes(p.combo));
     return roomMatch && typeMatch && comboMatch;
   });
 
@@ -93,15 +74,26 @@ export default function CataloguePage() {
     setSelectedCombos([]);
   };
 
+  if (productsLoading || roomTypesLoading || furnitureTypesLoading) {
+    return (
+      <main className="min-h-screen bg-stone-100 py-10">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#895D35] mx-auto"></div>
+            <p className="mt-4 text-gray-600">{t("loading_catalogue")}</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-stone-100 py-10">
       <div className="container mx-auto px-4 flex flex-col md:flex-row gap-8">
         {/* Sidebar Filters */}
         <aside className="w-full md:w-64 bg-white rounded-lg shadow-md p-6 mb-8 md:mb-0">
-          <h2 className="text-xl font-bold mb-4 text-[#895D35]">Filters</h2>
-          <div className="mb-4">
-            <h3 className="font-semibold mb-2">Room Type</h3>
-            {ROOM_TYPES.map((room) => (
+          <h2 className="text-xl font-bold mb-4 text-[#895D35]">{t("filters")}</h2>          <div className="mb-4">
+            <h3 className="font-semibold mb-2">{t("room_type")}</h3>            {roomTypes.map((room: string) => (
               <label key={room} className="flex items-center mb-1 cursor-pointer">
                 <input
                   type="checkbox"
@@ -109,13 +101,12 @@ export default function CataloguePage() {
                   onChange={() => toggleFilter(room, selectedRooms, setSelectedRooms)}
                   className="mr-2 accent-[#895D35]"
                 />
-                {room}
+                {translateRoomType(room)}
               </label>
             ))}
           </div>
           <div className="mb-4">
-            <h3 className="font-semibold mb-2">Furniture Type</h3>
-            {FURNITURE_TYPES.map((type) => (
+            <h3 className="font-semibold mb-2">{t("furniture_type")}</h3>            {furnitureTypes.map((type: string) => (
               <label key={type} className="flex items-center mb-1 cursor-pointer">
                 <input
                   type="checkbox"
@@ -123,13 +114,12 @@ export default function CataloguePage() {
                   onChange={() => toggleFilter(type, selectedTypes, setSelectedTypes)}
                   className="mr-2 accent-[#895D35]"
                 />
-                {type}
+                {translateFurnitureType(type)}
               </label>
             ))}
           </div>
           <div className="mb-4">
-            <h3 className="font-semibold mb-2">Furniture Combo</h3>
-            {FURNITURE_COMBOS.map((combo) => (
+            <h3 className="font-semibold mb-2">{t("furniture_combo")}</h3>            {furnitureCombos.map((combo: string) => (
               <label key={combo} className="flex items-center mb-1 cursor-pointer">
                 <input
                   type="checkbox"
@@ -137,34 +127,32 @@ export default function CataloguePage() {
                   onChange={() => toggleFilter(combo, selectedCombos, setSelectedCombos)}
                   className="mr-2 accent-[#895D35]"
                 />
-                {combo}
+                {translateComboType(combo)}
               </label>
             ))}
           </div>
           <button
-            onClick={clearFilters}
-            className="mt-2 bg-[#895D35] text-white px-4 py-2 rounded hover:bg-[#7A4F2A] w-full font-semibold"
+            onClick={clearFilters}            className="mt-2 bg-[#895D35] text-white px-4 py-2 rounded hover:bg-[#7A4F2A] w-full font-semibold"
           >
-            Clear Filters
+            {t("clear_filters")}
           </button>
         </aside>
 
         {/* Product Grid */}
         <section className="flex-1">
-          <h1 className="text-3xl font-bold mb-6 text-[#895D35]">Catalogue</h1>
+          <h1 className="text-3xl font-bold mb-6 text-[#895D35]">{t("catalogue")}</h1>
           {filteredProducts.length === 0 ? (
-            <div className="text-center text-gray-500 py-16">No products found.</div>
-          ) : (
+            <div className="text-center text-gray-500 py-16">{t("no_products_found")}</div>          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product: any) => (
                 <Link
                   key={product.id}
-                  href={`/catalogue/${product.id}`}
+                  href={`/catalogue/${product.slug}`}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col group"
                 >
                   <div className="relative h-48 w-full">
                     <Image
-                      src={product.image}
+                      src={product.images?.[0] || "/images/business-slide1.jpg"}
                       alt={product.name}
                       fill
                       style={{ objectFit: "cover" }}
@@ -173,13 +161,13 @@ export default function CataloguePage() {
                     />
                   </div>
                   <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="text-xl font-semibold mb-2 text-[#895D35] group-hover:text-[#7A4F2A] transition-colors">{product.name}</h3>
-                    <div className="text-sm text-gray-500 mb-1">{product.room} &bull; {product.type}</div>
-                    {product.combo && <div className="text-xs text-amber-700 mb-2">{product.combo}</div>}
+                    <h3 className="text-xl font-semibold mb-2 text-[#895D35] group-hover:text-[#7A4F2A] transition-colors">
+                      {product.name}
+                    </h3>                    <div className="text-sm text-gray-500 mb-1">{translateRoomType(product.room)} &bull; {translateFurnitureType(product.type)}</div>
+                    {product.combo && <div className="text-xs text-amber-700 mb-2">{translateComboType(product.combo)}</div>}
                     <div className="mt-auto flex items-center justify-between">
-                      <span className="text-lg font-bold text-[#895D35]">{product.price}</span>
-                      <span className="bg-[#895D35] text-white px-3 py-1 rounded hover:bg-[#7A4F2A] text-sm font-medium transition-colors group-hover:bg-[#7A4F2A]">
-                        View Details
+                      <span className="text-lg font-bold text-[#895D35]">${product.price}</span>                      <span className="bg-[#895D35] text-white px-3 py-1 rounded hover:bg-[#7A4F2A] text-sm font-medium transition-colors group-hover:bg-[#7A4F2A]">
+                        {t("view_details")}
                       </span>
                     </div>
                   </div>
