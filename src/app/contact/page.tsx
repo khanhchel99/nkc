@@ -3,7 +3,7 @@
 import { useI18n } from "../i18n";
 import Link from "next/link";
 import Image from "next/image";
-import InquiryForm from "../_components/InquiryForm";
+import ContactInquiryForm from "../_components/ContactInquiryForm";
 
 export default function ContactPage() {
   const { t } = useI18n();
@@ -36,7 +36,7 @@ export default function ContactPage() {
             <p className="text-gray-600 mb-4">
               {t("free_quote_desc")}
             </p>
-            <InquiryForm />
+            <ContactInquiryForm inquiryType="contact" />
           </div>
         </div>
         

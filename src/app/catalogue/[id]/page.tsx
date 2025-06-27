@@ -53,11 +53,11 @@ export default function ProductDetailPage() {
     slug: productSlug,
     locale: locale || 'en'
   });
-  const { data: allProducts = [] } = api.product.getAll.useQuery({ 
+  const { data: allProductsData } = api.product.getAll.useQuery({ 
     locale: locale || 'en'
   });
   // Get related products (same room type, excluding current product)
-  const relatedProducts = allProducts
+  const relatedProducts = (allProductsData?.products || [])
     .filter((p: any) => p.room === product?.room && p.slug !== productSlug)
     .slice(0, 3);
 

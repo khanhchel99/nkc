@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import InquiryForm from "../_components/InquiryForm";
+import ContactInquiryForm from "../_components/ContactInquiryForm";
 import { useI18n } from "../i18n";
 
 const services = [
@@ -124,7 +124,7 @@ export default function ServicesPage() {
 								{t("free_quote_desc")}
 							</p>
 
-							<InquiryForm />
+							<ContactInquiryForm inquiryType="services" />
 						</div>
 					</div>
 				</div>

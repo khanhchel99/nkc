@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useI18n } from "../i18n";
 import Carousel from "./Carousel";
-import { Session } from "next-auth";
+import type { Session } from "next-auth";
 
 export function HomeClient({ session }: { session: Session | null }) {
   const { t } = useI18n();

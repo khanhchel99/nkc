@@ -26,7 +26,7 @@ export function HomePageClient({ session }: { session: Session | null }) {
                 <LuUserCheck className="w-10 h-10 text-[#B47B3A]" />
               </div>
               <div className="text-5xl font-bold text-[#F5F5F5] mb-2">01</div>
-              <div className="font-semibold text-lg text-stone-800">{t("creative_designers")}</div>
+              <div className="font-heading text-lg text-stone-800">{t("creative_designers")}</div>
             </div>
             {/* Feature 2 */}
             <div className="flex flex-col items-center">
@@ -34,7 +34,7 @@ export function HomePageClient({ session }: { session: Session | null }) {
                 <LuCheck className="w-10 h-10 text-[#B47B3A]" />
               </div>
               <div className="text-5xl font-bold text-[#F5F5F5] mb-2">02</div>
-              <div className="font-semibold text-lg text-stone-800">{t("quality_products")}</div>
+              <div className="font-heading text-lg text-stone-800">{t("quality_products")}</div>
             </div>
             {/* Feature 3 */}
             <div className="flex flex-col items-center">
@@ -42,7 +42,7 @@ export function HomePageClient({ session }: { session: Session | null }) {
                 <LuMessagesSquare className="w-10 h-10 text-[#B47B3A]" />
               </div>
               <div className="text-5xl font-bold text-[#F5F5F5] mb-2">03</div>
-              <div className="font-semibold text-lg text-stone-800">{t("free_consultation")}</div>
+              <div className="font-heading text-lg text-stone-800">{t("free_consultation")}</div>
             </div>
             {/* Feature 4 */}
             <div className="flex flex-col items-center">
@@ -50,7 +50,7 @@ export function HomePageClient({ session }: { session: Session | null }) {
                 <LuHeadphones className="w-10 h-10 text-[#B47B3A]" />
               </div>
               <div className="text-5xl font-bold text-[#F5F5F5] mb-2">04</div>
-              <div className="font-semibold text-lg text-stone-800">{t("customer_support")}</div>
+              <div className="font-heading text-lg text-stone-800">{t("customer_support")}</div>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export function HomePageClient({ session }: { session: Session | null }) {
       <section className="py-20 bg-amber-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-[#895D35]">{t("our_services")}</h2>
+            <h2 className="text-5xl font-display text-luxury mb-6">{t("our_services")}</h2>
             <p className="text-lg max-w-2xl mx-auto text-stone-600">{t("services_intro")}</p>
           </div>
           
@@ -103,7 +103,7 @@ export function HomePageClient({ session }: { session: Session | null }) {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6 text-[#895D35]">{t("about_nkc")}</h2>
+              <h2 className="text-5xl font-display text-luxury mb-8">{t("about_nkc")}</h2>
               <p className="text-lg mb-6 text-stone-700">
                 {t("about_nkc_1")}
               </p>
@@ -165,11 +165,11 @@ function UserProfile() {
         </div>
         <div>
           <p className="text-sm text-[#895D35]/70">{t("title")}</p>
-          <p className="text-xl">{user.title ?? t("not_set")}</p>
+          <p className="text-xl">{t("not_set")}</p>
         </div>
         <div>
           <p className="text-sm text-[#895D35]/70">{t("company")}</p>
-          <p className="text-xl">{user.company ?? t("not_set")}</p>
+          <p className="text-xl">{t("not_set")}</p>
         </div>
         <div>
           <p className="text-sm text-[#895D35]/70">{t("phone")}</p>

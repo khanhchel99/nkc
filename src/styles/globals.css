@@ -1,6 +1,85 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+/* Custom font variables */
+:root {
+  --font-inter: var(--font-inter);
+  --font-playfair: var(--font-playfair);
+}
+
+/* Custom typography classes for luxury design */
+.font-heading {
+  font-family: var(--font-playfair), serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.font-display {
+  font-family: var(--font-playfair), serif;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+  line-height: 1.6;
+}
+
+.text-luxury {
+  background: linear-gradient(135deg, #8B4513 0%, #CD853F 50%, #D2691E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.3;
+  padding: 0.1em 0;
+}
+
+/* Better Vietnamese diacritics rendering */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+/* Ensure proper spacing for Vietnamese text */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+
+p {
+  line-height: 1.7;
+}
+
+/* Special handling for Vietnamese text to prevent clipping */
+.vietnamese-safe {
+  padding-top: 0.15em;
+  padding-bottom: 0.15em;
+  overflow: visible;
+}
+
+/* Ensure diacritics are never clipped */
+.text-luxury.vietnamese-safe {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+}
+
+/* Luxury gradient backgrounds */
+.luxury-gold {
+  background: linear-gradient(135deg, #8B7355 0%, #A0845C 25%, #B8956A 50%, #A0845C 75%, #8B7355 100%);
+}
+
+.luxury-crimson {
+  background: linear-gradient(135deg, #6B4423 0%, #8B5A3C 25%, #A0704F 50%, #8B5A3C 75%, #6B4423 100%);
+}
+
+.luxury-emerald {
+  background: linear-gradient(135deg, #4A5D4A 0%, #5C7A5C 25%, #6E8B6E 50%, #5C7A5C 75%, #4A5D4A 100%);
+}
+
+.luxury-sapphire {
+  background: linear-gradient(135deg, #3D4F5D 0%, #4A6B7A 25%, #578291 50%, #4A6B7A 75%, #3D4F5D 100%);
 }

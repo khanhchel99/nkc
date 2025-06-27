@@ -35,19 +35,58 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Role {
+  id          Int    @id @default(autoincrement())
+  name        String @unique // retail, wholesale, admin
+  description String?
+  users       User[]
+  rolePermissions RolePermission[]
+  
+  @@map("roles")
+}
+
+model Permission {
+  id          Int    @id @default(autoincrement())
+  name        String @unique // manage_orders, view_reports, etc.
+  description String?
+  rolePermissions RolePermission[]
+  
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  title         String?
   phone         String?
-  company       String?
+  passwordHash  String?
+  roleId        Int       @default(1) // Default to retail customer
+  status        String    @default("active") // active, inactive, banned
   createdAt     DateTime  @default(now())
-  modifiedAt    DateTime  @updatedAt
+  updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  role          Role      @relation(fields: [roleId], references: [id])
+  addresses     Address[]
+  paymentMethods PaymentMethod[]
+  orders        Order[]
+  businessProfile BusinessProfile?
+  cart          Cart?
+  auditLogs     AuditLog[]
+  
+  @@map("users")
 }
 
 model VerificationToken {
@@ -72,19 +111,23 @@ model InquiryForm {
 }
 
 model Product {
-  id                String   @id @default(cuid())
-  slug              String   @unique
-  price             Decimal  @db.Decimal(10, 2)
-  originalPrice     Decimal? @db.Decimal(10, 2)
+  id                String      @id @default(cuid())
+  slug              String      @unique
+  price             Decimal     @db.Decimal(10, 2)
+  wholesalePrice    Decimal?    @db.Decimal(10, 2) // Added wholesale pricing
+  originalPrice     Decimal?    @db.Decimal(10, 2)
   images            String[]
-  room              String
-  type              String
+  room              String      // Keep for backward compatibility
+  type              String      // Keep for backward compatibility
   combo             String?
-  category          String
-  inStock           Boolean  @default(true)
-  featured          Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  category          String      // Keep for backward compatibility
+  categoryId        String?     // New reference to Category model
+  subcategoryId     String?     // New reference to Subcategory model
+  inStock           Boolean     @default(true)
+  stock             Int         @default(0) // Added stock tracking
+  featured          Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
   descriptionEn     String
   descriptionVi     String
   featuresEn        String[]
@@ -99,10 +142,155 @@ model Product {
   nameVi            String
   specificationsEn  Json?
   specificationsVi  Json?
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  
+  // Relations to new category system
+  categoryRef       Category?   @relation("CategoryProducts", fields: [categoryId], references: [id])
+  subcategoryRef    Subcategory? @relation("SubcategoryProducts", fields: [subcategoryId], references: [id])
 
   @@index([room])
   @@index([type])
   @@index([combo])
   @@index([featured])
   @@index([inStock])
+  @@index([categoryId])
+  @@index([subcategoryId])
+}
+
+model Address {
+  id        Int     @id @default(autoincrement())
+  userId    String
+  label     String? // Home, Office, etc.
+  street    String
+  city      String
+  state     String
+  zip       String
+  country   String
+  isDefault Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("addresses")
+}
+
+model BusinessProfile {
+  id          Int      @id @default(autoincrement())
+  userId      String   @unique
+  companyName String
+  taxId       String?
+  documents   String[] // Array of file URLs/references
+  verified    Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("business_profiles")
+}
+
+model PaymentMethod {
+  id        Int     @id @default(autoincrement())
+  userId    String
+  type      String  // card, paypal, bank_transfer, etc.
+  details   Json    // Encrypted payment details
+  isDefault Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("payment_methods")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cartId    String
+  productId String
+  quantity  Int
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  status    String      @default("pending") // pending, confirmed, shipped, delivered, cancelled
+  total     Decimal     @db.Decimal(10, 2)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2) // Price at time of order
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+  
+  @@map("order_items")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  action    String   // login, logout, update_product, etc.
+  details   Json?    // Additional information
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  
+  @@map("audit_logs")
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  nameEn       String
+  nameVi       String
+  slug         String   @unique
+  descriptionEn String?
+  descriptionVi String?
+  image        String?
+  color        String?  // For UI theming
+  icon         String?  // For UI icons
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  subcategories Subcategory[]
+  products      Product[] @relation("CategoryProducts")
+  
+  @@map("categories")
+}
+
+model Subcategory {
+  id           String   @id @default(cuid())
+  nameEn       String
+  nameVi       String
+  slug         String   @unique
+  descriptionEn String?
+  descriptionVi String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  categoryId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  category     Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products     Product[] @relation("SubcategoryProducts")
+  
+  @@map("subcategories")
 }

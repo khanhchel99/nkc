@@ -25,8 +25,8 @@ export default function EditProfile() {
     if (user) {
       setFormData({
         name: user.name ?? "",
-        title: user.title ?? "",
-        company: user.company ?? "",
+        title: "", // Title field not available in current user model
+        company: "", // Company field not available in current user model
         phone: user.phone ?? "",
       });
     }

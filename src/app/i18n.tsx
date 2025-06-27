@@ -7,12 +7,14 @@ interface I18nContextProps {
   locale: Locale;
   t: (key: string) => string;
   setLocale: (locale: Locale) => void;
+  isTranslationsLoaded: boolean;
 }
 
 const I18nContext = createContext<I18nContextProps>({
   locale: "en",
   t: (key) => key,
   setLocale: () => {},
+  isTranslationsLoaded: false,
 });
 
 export const I18nProvider = ({
@@ -25,6 +27,7 @@ export const I18nProvider = ({
   const [locale, setLocaleState] = useState<Locale>(defaultLocale);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isTranslationsLoaded, setIsTranslationsLoaded] = useState(false);
 
   // Load saved locale from localStorage on initial mount
   useEffect(() => {
@@ -44,18 +47,31 @@ export const I18nProvider = ({
   // Fetch translations whenever locale changes (but only after initial localStorage check)
   useEffect(() => {
     if (isLoaded) {
+      setIsTranslationsLoaded(false);
       fetch(`/locales/${locale}/common.json`)
         .then((res) => res.json())
-        .then((data) => setTranslations(data))
-        .catch((error) => console.error('Failed to load translations:', error));
+        .then((data) => {
+          setTranslations(data);
+          setIsTranslationsLoaded(true);
+        })
+        .catch((error) => {
+          console.error('Failed to load translations:', error);
+          setIsTranslationsLoaded(true); // Set to true even on error to prevent infinite loading
+        });
     }
   }, [locale, isLoaded]);
   // Translation function
-  const t = (key: string) => translations[key] || key;
+  const t = (key: string) => {
+    const translation = translations[key];
+    if (!translation && isTranslationsLoaded) {
+      console.warn(`Missing translation for key: ${key} in locale: ${locale}`);
+    }
+    return translation || key;
+  };
 
   // Only render children after initial localStorage check to avoid hydration mismatch
   return (
-    <I18nContext.Provider value={{ locale, t, setLocale }}>
+    <I18nContext.Provider value={{ locale, t, setLocale, isTranslationsLoaded }}>
       {children}
     </I18nContext.Provider>
   );
