@@ -22,7 +22,7 @@ interface FilterState {
   rooms: string[];
   types: string[];
   combos: string[];
-  sortBy: 'createdAt' | 'price' | 'name';
+  sortBy: 'createdAt' | 'name';
   sortOrder: 'asc' | 'desc';
 }
 
@@ -221,8 +221,6 @@ export default function CatalogueClient() {
             >
               <option value="createdAt-desc">{t("newest_first") || "Newest First"}</option>
               <option value="createdAt-asc">{t("oldest_first") || "Oldest First"}</option>
-              <option value="price-asc">{t("price_low_high") || "Price: Low to High"}</option>
-              <option value="price-desc">{t("price_high_low") || "Price: High to Low"}</option>
               <option value="name-asc">{t("name_a_z") || "Name: A to Z"}</option>
               <option value="name-desc">{t("name_z_a") || "Name: Z to A"}</option>
             </select>
@@ -371,14 +369,9 @@ export default function CatalogueClient() {
                           )}
                           <div className="mt-auto flex items-center justify-between">
                             <div className="flex flex-col">
-                              <span className="text-lg font-bold text-[#895D35]">
-                                ${product.price}
+                              <span className="text-sm text-gray-600">
+                                {t("contact_for_pricing")}
                               </span>
-                              {product.originalPrice && product.originalPrice > product.price && (
-                                <span className="text-sm text-gray-500 line-through">
-                                  ${product.originalPrice}
-                                </span>
-                              )}
                             </div>
                             <span className="bg-[#895D35] text-white px-3 py-1 rounded hover:bg-[#7A4F2A] text-sm font-medium transition-colors group-hover:bg-[#7A4F2A]">
                               {t("view_details")}

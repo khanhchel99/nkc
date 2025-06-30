@@ -6,6 +6,8 @@ export interface SessionUser {
   name: string;
   role: string;
   permissions: string[];
+  userType: 'retail' | 'wholesale'; // Add user type to distinguish between User and WholesaleUser
+  companyId?: string; // For wholesale users
 }
 
 export class AuthService {
@@ -115,7 +117,9 @@ export class AuthService {
       email: user.email!,
       name: user.name!,
       role: user.role.name,
-      permissions: user.role.rolePermissions.map((rp: any) => rp.permission.name),
+      permissions: user.role.rolePermissions?.map((rp: any) => rp.permission.name) || [],
+      userType: user.userType || 'retail',
+      companyId: user.companyId,
     };
   }
 

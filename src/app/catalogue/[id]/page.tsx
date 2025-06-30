@@ -46,7 +46,7 @@ export default function ProductDetailPage() {
   };
   
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedTab, setSelectedTab] = useState("description");  const [quantity, setQuantity] = useState(1);
+  const [selectedTab, setSelectedTab] = useState("description");
 
   // Fetch product data from database using TRPC
   const { data: product, isLoading, error } = api.product.getBySlug.useQuery({ 
@@ -56,6 +56,28 @@ export default function ProductDetailPage() {
   const { data: allProductsData } = api.product.getAll.useQuery({ 
     locale: locale || 'en'
   });
+  
+  // Get current user data
+  const { data: user, isLoading: userLoading } = api.user.getCurrentUserOptional.useQuery();
+  const isWholesaleUser = user?.role?.name === 'wholesale';
+  const isLoggedIn = !!user;
+  
+  // Inquiry list mutations
+  const addToInquiryList = api.inquiryList.addItem.useMutation({
+    onSuccess: () => {
+      alert(t("product_added_to_inquiry_list"));
+    },
+    onError: (error) => {
+      alert(t("error_adding_to_inquiry_list"));
+      console.error("Error adding to inquiry list:", error);
+    },
+  });
+  
+  const { data: isInInquiryList } = api.inquiryList.isInList.useQuery(
+    { productId: product?.id || "" },
+    { enabled: !!product?.id && isWholesaleUser }
+  );
+  
   // Get related products (same room type, excluding current product)
   const relatedProducts = (allProductsData?.products || [])
     .filter((p: any) => p.room === product?.room && p.slug !== productSlug)
@@ -153,52 +175,91 @@ export default function ProductDetailPage() {
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
               <p className="text-gray-700 text-lg leading-relaxed">{product.description}</p>
-            </div>            {/* Price */}
-            <div className="flex items-baseline space-x-3">
-              <span className="text-3xl font-bold text-[#895D35]">${Number(product.price)}</span>
-              {product.originalPrice && (
-                <span className="text-xl text-gray-500 line-through">${Number(product.originalPrice)}</span>
-              )}
-              {product.originalPrice && (                <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-medium">
-                  {t("save_percentage")} {((Number(product.originalPrice) - Number(product.price)) / Number(product.originalPrice) * 100).toFixed(0)}%
-                </span>
+            </div>            {/* Wholesale-only messaging */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-2">
+                {!isLoggedIn ? t("wholesale_only_notice") : 
+                 !isWholesaleUser ? t("wholesale_account_required") : 
+                 t("wholesale_pricing_available")}
+              </h4>
+              <p className="text-gray-700 text-sm">
+                {!isLoggedIn ? t("login_to_see_wholesale_benefits") : 
+                 !isWholesaleUser ? t("contact_for_wholesale_account") : 
+                 t("wholesale_pricing_info")}
+              </p>
+            </div>
+
+            {/* Action Buttons - Dynamic based on user status */}
+            <div className="flex space-x-4">
+              {!isLoggedIn ? (
+                // Guest user - show login and contact buttons
+                <>
+                  <Link 
+                    href="/auth/signin"
+                    className="flex-1 border border-[#895D35] text-[#895D35] py-3 px-6 rounded-lg font-semibold hover:bg-[#895D35] hover:text-white transition text-center"
+                  >
+                    {t("sign_in_for_wholesale")}
+                  </Link>
+                  <Link 
+                    href="/contact"
+                    className="flex-1 bg-[#895D35] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#7A4F2A] transition text-center"
+                  >
+                    {t("contact_for_account")}
+                  </Link>
+                </>
+              ) : isWholesaleUser ? (
+                // Logged in wholesale user - show quote and inquiry buttons
+                <>
+                  <Link 
+                    href="/contact"
+                    className="flex-1 bg-[#895D35] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#7A4F2A] transition text-center"
+                  >
+                    {t("request_quote")}
+                  </Link>
+                  <button
+                    className={`flex-1 border font-semibold py-3 px-6 rounded-lg transition ${
+                      isInInquiryList 
+                        ? "border-gray-400 text-gray-400 cursor-not-allowed" 
+                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    }`}
+                    onClick={() => {
+                      if (!isInInquiryList && product) {
+                        addToInquiryList.mutate({ productId: product.id });
+                      }
+                    }}
+                    disabled={isInInquiryList || addToInquiryList.isPending}
+                  >
+                    {isInInquiryList ? t("already_in_inquiry_list") : t("add_to_inquiry_list")}
+                  </button>
+                </>
+              ) : (
+                // Logged in retail user - show contact button only
+                <Link 
+                  href="/contact"
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition text-center"
+                >
+                  Contact for Wholesale Account
+                </Link>
               )}
             </div>
 
-            {/* Quantity and Add to Cart */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center border border-gray-300 rounded">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 hover:bg-gray-100"
-                >
-                  -
-                </button>
-                <span className="px-4 py-2 border-x border-gray-300">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 hover:bg-gray-100"
-                >
-                  +
-                </button>
+            {/* Wholesale Benefits */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h4 className="font-semibold text-gray-900 mb-4">{t("wholesale_benefits")}</h4>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-[#895D35] rounded-full"></div>
+                  <span className="text-gray-700">{t("bulk_pricing")}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-[#895D35] rounded-full"></div>
+                  <span className="text-gray-700">{t("dedicated_support")}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-[#895D35] rounded-full"></div>
+                  <span className="text-gray-700">{t("custom_orders")}</span>
+                </div>
               </div>
-              <button
-                disabled={!product.inStock}
-                className={`flex-1 py-3 px-6 rounded font-semibold transition ${
-                  product.inStock
-                    ? "bg-[#895D35] text-white hover:bg-[#7A4F2A]"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}              >
-                {product.inStock ? t("add_to_cart") : t("out_of_stock")}
-              </button>
-            </div>            {/* Action Buttons */}
-            <div className="flex space-x-4">
-              <button className="flex-1 border border-[#895D35] text-[#895D35] py-2 px-4 rounded hover:bg-[#895D35] hover:text-white transition">
-                {t("add_to_wishlist")}
-              </button>
-              <button className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition">
-                {t("share")}
-              </button>
             </div>            {/* Quick Info */}
             <div className="bg-amber-50 p-4 rounded-lg">
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -291,7 +352,7 @@ export default function ProductDetailPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">{relatedProduct.name}</h3>
-                  <p className="text-[#895D35] font-bold">${Number(relatedProduct.price)}</p>
+                  <p className="text-gray-600 text-sm">{translateRoomType(relatedProduct.room)} • {translateFurnitureType(relatedProduct.type)}</p>
                 </div>
               </Link>
             ))}

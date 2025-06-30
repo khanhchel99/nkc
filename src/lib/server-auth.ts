@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { AuthService, type SessionUser } from './auth-service';
+import { db } from '../server/db';
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
   try {
@@ -10,7 +11,46 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       return null;
     }
 
-    const sessionWithUser = await AuthService.getSessionByToken(sessionToken) as any;
+    // First try regular session
+    let sessionWithUser = await AuthService.getSessionByToken(sessionToken) as any;
+    
+    // If not found in regular sessions, try wholesale sessions
+    if (!sessionWithUser) {
+      try {
+        const wholesaleSession = await (db as any).wholesaleSession.findUnique({
+          where: { sessionToken },
+          include: {
+            user: {
+              include: {
+                role: true,
+                company: true,
+              },
+            },
+          },
+        });
+
+        if (wholesaleSession) {
+          // Transform wholesale session to match expected structure
+          sessionWithUser = {
+            ...wholesaleSession,
+            expires: wholesaleSession.expires, // Field is already named 'expires' in schema
+            user: {
+              ...wholesaleSession.user,
+              userType: 'wholesale' as const,
+              role: {
+                id: wholesaleSession.user.role.id,
+                name: 'wholesale',
+                description: wholesaleSession.user.role.description,
+                rolePermissions: []
+              },
+              companyId: wholesaleSession.user.companyId
+            }
+          };
+        }
+      } catch (error) {
+        console.log('Error checking wholesale sessions:', error);
+      }
+    }
     
     if (!sessionWithUser || !sessionWithUser.user) {
       return null;

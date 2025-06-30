@@ -10,8 +10,31 @@ export const userRouter = createTRPCRouter({
   getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
+      include: {
+        role: true,
+        businessProfile: true,
+      }
     });
 
+    return user;
+  }),
+
+  getCurrentUserOptional: publicProcedure.query(async ({ ctx }) => {
+    console.log('DEBUG: Session in getCurrentUserOptional:', ctx.session?.user?.id);
+    
+    if (!ctx.session?.user?.id) {
+      return null;
+    }
+
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+      include: {
+        role: true,
+        businessProfile: true,
+      }
+    });
+
+    console.log('DEBUG: User found:', user?.name, user?.role?.name);
     return user;
   }),
 

@@ -85,6 +85,8 @@ model User {
   businessProfile BusinessProfile?
   cart          Cart?
   auditLogs     AuditLog[]
+  inquiryListItems InquiryListItem[]
+  inquirySubmissions InquirySubmission[]
   
   @@map("users")
 }
@@ -144,6 +146,7 @@ model Product {
   specificationsVi  Json?
   cartItems         CartItem[]
   orderItems        OrderItem[]
+  inquiryListItems  InquiryListItem[]
   
   // Relations to new category system
   categoryRef       Category?   @relation("CategoryProducts", fields: [categoryId], references: [id])
@@ -293,4 +296,373 @@ model Subcategory {
   products     Product[] @relation("SubcategoryProducts")
   
   @@map("subcategories")
+}
+
+model InquiryListItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  quantity  Int      @default(1)  // Quantity requested
+  notes     String?  // Optional notes for this inquiry item
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, productId]) // Prevent duplicate entries
+  @@map("inquiry_list_items")
+}
+
+model InquirySubmission {
+  id           String   @id @default(cuid())
+  userId       String
+  customerName String
+  customerEmail String
+  companyName  String?
+  phone        String?
+  message      String?
+  status       String   @default("pending") // pending, reviewing, quoted, closed
+  items        Json     // Array of {productId, productName, quantity, notes}
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailThread  EmailThread?
+  
+  @@map("inquiry_submissions")
+}
+
+model EmailThread {
+  id            String   @id @default(cuid())
+  inquiryId     String   @unique
+  customerEmail String
+  customerName  String
+  subject       String
+  threadId      String   @unique // Unique thread identifier for email headers
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  inquiry       InquirySubmission @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  emails        Email[]
+  
+  @@map("email_threads")
+}
+
+model Email {
+  id            String   @id @default(cuid())
+  threadId      String
+  messageId     String   @unique // Email message ID from email service
+  fromEmail     String
+  toEmail       String
+  subject       String
+  htmlContent   String?
+  textContent   String?
+  emailType     String   // inquiry_acknowledgment, admin_reply, customer_reply, quote_ready, follow_up
+  sentAt        DateTime @default(now())
+  isFromAdmin   Boolean  @default(false)
+  
+  emailThread   EmailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  
+  @@map("emails")
+}
+
+// Wholesale Company Management
+model WholesaleCompany {
+  id              String   @id @default(cuid())
+  name            String   // "Hubsch", "Company 2"
+  code            String   @unique // "HUBSCH", "COMP2" - for easy identification
+  subdomain       String?  @unique // hubsch.yoursite.com (optional)
+  contactEmail    String
+  contactPhone    String?
+  address         String?
+  taxId           String?
+  status          String   @default("active") // active, inactive, suspended
+  settings        Json?    // Company-specific settings (currencies, etc.)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  users           WholesaleUser[]
+  orders          WholesaleOrder[]
+  privateProducts PrivateProduct[]
+  financialRecords FinancialRecord[]
+  communications  CommunicationThread[]
+  
+  @@map("wholesale_companies")
+}
+
+model WholesaleRole {
+  id          Int    @id @default(autoincrement())
+  name        String @unique // ceo, purchase, qa, finance
+  displayName String // "Chief Executive Officer", "Purchase Manager"
+  description String?
+  permissions Json   // Store permissions as JSON for flexibility
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  users       WholesaleUser[]
+  
+  @@map("wholesale_roles")
+}
+
+model WholesaleUser {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  phone       String?
+  passwordHash String
+  status      String   @default("active") // active, inactive
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Company and role relationships
+  companyId   String
+  company     WholesaleCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  roleId      Int
+  role        WholesaleRole @relation(fields: [roleId], references: [id])
+  
+  // Relations
+  orders      WholesaleOrder[]
+  communications CommunicationThread[]
+  sessions    WholesaleSession[]
+  
+  @@map("wholesale_users")
+}
+
+model WholesaleSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  companyId    String   // For additional security
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  
+  user         WholesaleUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("wholesale_sessions")
+}
+
+// Private Products for Custom Designs
+model PrivateProduct {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  sku             String   // Company-specific SKU
+  category        String?
+  specifications  Json     // Technical specs, materials, dimensions
+  images          String[] // Array of image URLs
+  designFiles     String[] // CAD files, technical drawings
+  status          String   @default("active") // active, discontinued, draft
+  basePrice       Decimal? @db.Decimal(10, 2) // Base manufacturing cost
+  notes           String?  // Internal notes
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Company relationship
+  companyId       String
+  company         WholesaleCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  orderItems      WholesaleOrderItem[]
+  
+  @@unique([companyId, sku]) // Unique SKU per company
+  @@map("private_products")
+}
+
+// Wholesale Orders
+model WholesaleOrder {
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique // WS-2024-001, etc.
+  status        String   @default("pending") // pending, confirmed, in_production, quality_check, shipped, delivered, cancelled
+  priority      String   @default("normal") // low, normal, high, urgent
+  totalAmount   Decimal  @db.Decimal(10, 2)
+  currency      String   @default("USD")
+  notes         String?
+  internalNotes String?  // Notes visible only to your team
+  estimatedDelivery DateTime?
+  actualDelivery DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relationships
+  companyId     String
+  company       WholesaleCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId        String
+  user          WholesaleUser @relation(fields: [userId], references: [id])
+  
+  // Order details
+  items         WholesaleOrderItem[]
+  statusHistory OrderStatusHistory[]
+  financialRecords FinancialRecord[]
+  shippingInfo  ShippingInfo?
+  
+  @@map("wholesale_orders")
+}
+
+model WholesaleOrderItem {
+  id            Int      @id @default(autoincrement())
+  quantity      Int
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  totalPrice    Decimal  @db.Decimal(10, 2)
+  specifications Json?   // Custom specifications for this order
+  notes         String?
+  
+  // Relationships
+  orderId       String
+  order         WholesaleOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       PrivateProduct @relation(fields: [productId], references: [id])
+  inspection    ProductInspection?
+  
+  @@map("wholesale_order_items")
+}
+
+model OrderStatusHistory {
+  id        Int      @id @default(autoincrement())
+  status    String
+  notes     String?
+  changedBy String   // User ID or "system"
+  createdAt DateTime @default(now())
+  
+  orderId   String
+  order     WholesaleOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@map("order_status_history")
+}
+
+// Financial Records
+model FinancialRecord {
+  id          String   @id @default(cuid())
+  type        String   // invoice, payment, credit_note, adjustment
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  description String
+  reference   String?  // Invoice number, payment reference
+  dueDate     DateTime?
+  paidDate    DateTime?
+  status      String   @default("pending") // pending, paid, overdue, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  companyId   String
+  company     WholesaleCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  orderId     String?
+  order       WholesaleOrder? @relation(fields: [orderId], references: [id])
+  
+  @@map("financial_records")
+}
+
+// Communication System
+model CommunicationThread {
+  id        String   @id @default(cuid())
+  subject   String
+  type      String   // product_request, order_inquiry, support, general
+  status    String   @default("open") // open, in_progress, resolved, closed
+  priority  String   @default("normal") // low, normal, high, urgent
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relationships
+  companyId String
+  company   WholesaleCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      WholesaleUser @relation(fields: [userId], references: [id])
+  
+  // Messages in this thread
+  messages  CommunicationMessage[]
+  
+  @@map("communication_threads")
+}
+
+model CommunicationMessage {
+  id        String   @id @default(cuid())
+  content   String
+  sender    String   // "customer" or "support"
+  senderName String
+  attachments String[] // File URLs
+  createdAt DateTime @default(now())
+  
+  threadId  String
+  thread    CommunicationThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  
+  @@map("communication_messages")
+}
+
+// Shipping Information for Wholesale Orders
+model ShippingInfo {
+  id              String   @id @default(cuid())
+  vesselName      String?  // Name of the shipping vessel
+  vesselIMO       String?  // IMO number of the vessel
+  portOfLoading   String?  // Port where goods are loaded
+  portOfDischarge String?  // Destination port
+  etd             DateTime? // Estimated Time of Departure
+  eta             DateTime? // Estimated Time of Arrival
+  actualDeparture DateTime? // Actual departure date
+  actualArrival   DateTime? // Actual arrival date
+  containerNumber String?  // Container number
+  sealNumber      String?  // Container seal number
+  billOfLading    String?  // Bill of lading number
+  trackingUrl     String?  // Shipping line tracking URL
+  notes           String?  // Additional shipping notes
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationship to order
+  orderId         String   @unique
+  order           WholesaleOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@map("shipping_info")
+}
+
+// Product Inspection Photos for Quality Control
+model ProductInspection {
+  id          String   @id @default(cuid())
+  status      String   @default("pending") // pending, in_progress, completed, approved, rejected
+  inspectedBy String?  // Inspector name/ID
+  inspectedAt DateTime?
+  notes       String?  // Inspection notes
+  approved    Boolean  @default(false)
+  
+  // Customer review fields
+  customerStatus    String   @default("pending_review") // "pending_review", "approved", "rejected", "needs_re_inspection"
+  customerReviewedBy String? // ID of wholesale user who reviewed
+  customerReviewedAt DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationship to order item
+  orderItemId Int      @unique
+  orderItem   WholesaleOrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  
+  // Inspection photos
+  photos      InspectionPhoto[]
+  
+  @@map("product_inspections")
+}
+
+// Individual inspection photos with categories
+model InspectionPhoto {
+  id          String   @id @default(cuid())
+  category    String   // "master_box_front", "master_box_side", "master_box_top", "master_box_open", "product_overall", "product_detail", "defects"
+  imageUrl    String   // URL to the photo
+  caption     String?  // Optional caption/description
+  sortOrder   Int      @default(0) // For ordering photos within category
+  
+  // Review fields
+  reviewStatus    String   @default("pending_review") // "pending_review", "approved", "rejected"
+  reviewedBy      String?  // ID of the wholesale user who reviewed
+  reviewedAt      DateTime?
+  rejectionReason String?  // Required when rejected
+  
+  createdAt   DateTime @default(now())
+  
+  // Relationship to inspection
+  inspectionId String
+  inspection   ProductInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  
+  @@map("inspection_photos")
 }

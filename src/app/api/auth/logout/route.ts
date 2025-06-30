@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { AuthService } from '../../../../lib/auth-service';
+import { db } from '../../../../server/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,12 +9,18 @@ export async function POST(request: NextRequest) {
     const sessionToken = cookieStore.get('session')?.value;
 
     if (sessionToken) {
-      // Delete session from database
+      // Delete session from database (try both regular and wholesale sessions)
       try {
         await AuthService.deleteSession(sessionToken);
       } catch (error) {
-        // Session might not exist in database, which is fine
-        console.log('Session not found in database:', error);
+        // Try wholesale session table
+        try {
+          await (db as any).wholesaleSession.delete({
+            where: { sessionToken },
+          });
+        } catch (wholesaleError) {
+          console.log('Session not found in either table');
+        }
       }
     }
 

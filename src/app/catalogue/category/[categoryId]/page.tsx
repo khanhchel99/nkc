@@ -12,7 +12,7 @@ export default function CategoryPage() {
   const { locale, t, isTranslationsLoaded } = useI18n();
   
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("");
-  const [sortBy, setSortBy] = useState<'createdAt' | 'price' | 'name'>('createdAt');
+  const [sortBy, setSortBy] = useState<'createdAt' | 'name'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // ALL HOOKS MUST BE CALLED FIRST - before any conditional returns
@@ -185,12 +185,6 @@ export default function CategoryPage() {
                 <option value="createdAt-asc">
                   {isTranslationsLoaded ? t("oldest_first") : "Oldest First"}
                 </option>
-                <option value="price-asc">
-                  {isTranslationsLoaded ? t("price_low_high") : "Price: Low to High"}
-                </option>
-                <option value="price-desc">
-                  {isTranslationsLoaded ? t("price_high_low") : "Price: High to Low"}
-                </option>
                 <option value="name-asc">
                   {isTranslationsLoaded ? t("name_a_z") : "Name: A to Z"}
                 </option>
@@ -251,16 +245,9 @@ export default function CategoryPage() {
                     {product.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-lg font-bold text-[#895D35]">
-                        ${product.price.toLocaleString()}
-                      </span>
-                      {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ${product.originalPrice.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-sm text-gray-600">
+                      {isTranslationsLoaded ? t("contact_for_pricing") : "Contact for Pricing"}
+                    </span>
                     <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                       {product.room}
                     </span>

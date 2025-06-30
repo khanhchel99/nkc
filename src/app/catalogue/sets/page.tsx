@@ -7,7 +7,7 @@ import { useI18n } from "../../i18n";
 
 export default function FurnitureSetsPage() {
   const { locale, t } = useI18n();
-  const [sortBy, setSortBy] = useState<'createdAt' | 'price' | 'name'>('createdAt');
+  const [sortBy, setSortBy] = useState<'createdAt' | 'name'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Get products with combo/sets
@@ -110,8 +110,6 @@ export default function FurnitureSetsPage() {
               >
                 <option value="createdAt-desc">{t("newest_first")}</option>
                 <option value="createdAt-asc">{t("oldest_first")}</option>
-                <option value="price-asc">{t("price_low_high")}</option>
-                <option value="price-desc">{t("price_high_low")}</option>
                 <option value="name-asc">{t("name_a_z")}</option>
                 <option value="name-desc">{t("name_z_a")}</option>
               </select>
@@ -168,16 +166,9 @@ export default function FurnitureSetsPage() {
                     {product.combo}
                   </div>
                   <div className="mt-auto flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-lg font-bold text-[#895D35]">
-                        ${product.price}
-                      </span>
-                      {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ${product.originalPrice}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-sm text-gray-600">
+                      {t("contact_for_pricing")}
+                    </span>
                     <span className="bg-[#895D35] text-white px-3 py-1 rounded hover:bg-[#7A4F2A] text-sm font-medium transition-colors group-hover:bg-[#7A4F2A]">
                       {t("view_details")}
                     </span>

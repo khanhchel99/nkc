@@ -34,9 +34,13 @@ const SignInPage = () => {
       if (response.ok) {
         console.log('Login response data:', data);
         console.log('User role:', data.user?.role);
+        console.log('User type:', data.user?.userType);
         
-        // Login successful, redirect based on user role
-        if (data.user.role === 'admin') {
+        // Login successful, redirect based on user role and type
+        if (data.user.userType === 'wholesale') {
+          console.log('Redirecting to wholesale dashboard');
+          window.location.href = '/wholesale/dashboard';
+        } else if (data.user.role === 'admin') {
           console.log('Redirecting to admin dashboard');
           window.location.href = '/admin';
         } else {
