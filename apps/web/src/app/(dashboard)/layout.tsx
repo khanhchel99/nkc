@@ -12,6 +12,8 @@ import {
   Factory,
   Warehouse,
   ShieldCheck,
+  Truck,
+  Receipt,
   LogOut,
   Menu,
   X,
@@ -26,6 +28,8 @@ const navItems = [
   { href: '/production', label: 'Sản xuất', icon: Factory },
   { href: '/inventory', label: 'Kho hàng', icon: Warehouse },
   { href: '/quality', label: 'Chất lượng', icon: ShieldCheck },
+  { href: '/shipping', label: 'Giao hàng', icon: Truck },
+  { href: '/billing', label: 'Hóa đơn', icon: Receipt },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

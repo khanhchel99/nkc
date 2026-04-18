@@ -7,3 +7,5 @@ export * from './planning';
 export * from './inventory';
 export * from './production';
 export * from './quality';
+export * from './shipping';
+export * from './billing';
