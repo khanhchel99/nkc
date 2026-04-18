@@ -289,14 +289,14 @@ nkc-erp/
 │   ├── web/                    # Next.js 14 app (deployed to Vercel)
 │   │   ├── src/
 │   │   │   ├── app/
-│   │   │   │   ├── api/        # 34+ API route handlers
+│   │   │   │   ├── api/        # 57 API route files
 │   │   │   │   ├── (dashboard)/# Vietnamese Web UI (20 pages)
 │   │   │   │   └── login/      # Login page
 │   │   │   ├── components/     # React components (shadcn/ui)
 │   │   │   ├── lib/            # prisma.ts, auth.ts, api-helpers.ts
 │   │   │   └── stores/         # Zustand state management
 │   │   └── next.config.js
-│   └── mobile/                 # Expo React Native (Phase 4 — not deployed yet)
+│   └── mobile/                 # Expo React Native (not deployed yet)
 ├── packages/
 │   ├── database/               # Prisma schema + generated client
 │   ├── types/                  # Shared TypeScript types
