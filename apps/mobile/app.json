@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "NKC ERP",
+    "slug": "nkc-erp-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "nkc-erp",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "bundleIdentifier": "com.nkc.erp"
+    },
+    "android": {
+      "package": "com.nkc.erp"
+    },
+    "plugins": ["expo-router", "expo-camera"]
+  }
+}
