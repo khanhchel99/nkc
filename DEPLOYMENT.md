@@ -11,12 +11,18 @@
 │   Browser    │──────▶│  Vercel (Free)   │──────▶│ Supabase (Free)  │
 │              │◀──────│  Next.js 14 App  │◀──────│ PostgreSQL 16    │
 └─────────────┘       └──────────────────┘       └──────────────────┘
+                              ▲
+┌─────────────┐               │
+│ iOS/Android │───────────────┘
+│ Expo App    │  (REST API via same Vercel endpoints)
+└─────────────┘
 ```
 
 | Component       | Service           | Free Tier Limits                        |
 |-----------------|-------------------|-----------------------------------------|
 | **Frontend + API** | Vercel         | 100 GB bandwidth, 1000 serverless invocations/day, 10s function timeout |
 | **Database**    | Supabase          | 500 MB database, 1 GB file storage, 50K monthly active users |
+| **Mobile App**  | Expo EAS          | 30 builds/month, 1000 monthly active users (OTA) |
 | **Source Code** | GitHub            | Unlimited public/private repos           |
 
 ---
@@ -296,7 +302,10 @@ nkc-erp/
 │   │   │   ├── lib/            # prisma.ts, auth.ts, api-helpers.ts
 │   │   │   └── stores/         # Zustand state management
 │   │   └── next.config.js
-│   └── mobile/                 # Expo React Native (not deployed yet)
+│   └── mobile/                 # Expo React Native app (deployed via EAS)
+│       ├── app/                # expo-router screens (tabs + detail pages)
+│       ├── src/lib/            # API client, auth store, theme, storage
+│       └── src/__tests__/      # Jest tests (109 tests, 13 suites)
 ├── packages/
 │   ├── database/               # Prisma schema + generated client
 │   ├── types/                  # Shared TypeScript types
@@ -313,8 +322,161 @@ nkc-erp/
 
 ---
 
+## Step 5: Deploy Mobile App (Expo / EAS Build)
+
+The mobile app (`apps/mobile`) is built with **Expo 51** and **expo-router**, connecting to the same Vercel API endpoints as the web app.
+
+### 5.1 Prerequisites
+
+```bash
+# Install EAS CLI globally
+npm install -g eas-cli
+
+# Login to Expo account (create free at expo.dev)
+eas login
+```
+
+### 5.2 Initialize EAS in the Mobile App
+
+```bash
+cd apps/mobile
+
+# Link to an Expo project (creates/links project on expo.dev)
+eas init
+```
+
+This creates an `eas.json` file. Replace its contents with:
+
+```json
+{
+  "cli": { "version": ">= 12.0.0" },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://nkc-erp.vercel.app"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://nkc-erp.vercel.app"
+      }
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://nkc-erp.vercel.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
+```
+
+> **Note**: Replace `https://nkc-erp.vercel.app` with your actual Vercel deployment URL.
+
+### 5.3 Configure API URL in the App
+
+The mobile app uses `expo-secure-store` to persist a custom API URL. By default it reads from the environment variable or falls back to `http://localhost:3000`. For production builds, ensure `EXPO_PUBLIC_API_URL` is set in `eas.json` (see above).
+
+Users can also override the API URL on the login screen (tap "Cấu hình server" to expand the server URL field).
+
+### 5.4 Build for Testing (Internal Distribution)
+
+**Android (APK for internal testing)**:
+```bash
+cd apps/mobile
+eas build --profile preview --platform android
+```
+
+**iOS (requires Apple Developer account, $99/year)**:
+```bash
+# Register iOS devices first
+eas device:create
+
+# Build for internal testing
+eas build --profile preview --platform ios
+```
+
+After the build completes, EAS provides a download link. Share it with testers or install via Expo's QR code.
+
+### 5.5 Build for Production (App Store / Google Play)
+
+**Android (AAB for Google Play)**:
+```bash
+eas build --profile production --platform android
+```
+
+**iOS (IPA for App Store)**:
+```bash
+eas build --profile production --platform ios
+```
+
+### 5.6 Submit to App Stores
+
+```bash
+# Submit to Google Play (requires Google Play Console setup)
+eas submit --platform android
+
+# Submit to Apple App Store (requires App Store Connect setup)
+eas submit --platform ios
+```
+
+### 5.7 Over-the-Air Updates (OTA)
+
+For JS-only changes (no native module changes), use EAS Update for instant updates without app store review:
+
+```bash
+# Install expo-updates (one-time)
+cd apps/mobile
+npx expo install expo-updates
+
+# Push an OTA update
+eas update --branch production --message "Bug fix: ..."
+```
+
+### 5.8 Development Workflow
+
+```bash
+# Run locally with Expo Go (development)
+cd apps/mobile
+pnpm dev
+
+# Scan QR code with Expo Go app on your phone
+# Make sure API URL points to your local machine:
+#   - On the login screen, set server URL to http://<your-ip>:3000
+```
+
+### 5.9 Running Mobile Tests
+
+```bash
+cd apps/mobile
+pnpm test              # Run all 109 tests
+pnpm test -- --watch   # Watch mode during development
+```
+
+### EAS Free Tier Limits
+
+| Resource               | Limit                              |
+|------------------------|------------------------------------|
+| Builds                 | 30 builds/month (iOS + Android)    |
+| Updates                | 1000 monthly active users          |
+| Build concurrency      | 1 (sequential builds)              |
+| Build queue priority   | Low (free tier)                    |
+
+> **Tip**: Use `--local` flag to build on your own machine and avoid consuming EAS build quota:
+> ```bash
+> eas build --profile preview --platform android --local
+> ```
+
+---
+
 ## Summary Checklist
 
+### Web App (Vercel + Supabase)
 - [ ] Push code to GitHub
 - [ ] Create Supabase project (free tier)
 - [ ] Copy connection string (pooler, port 6543)
@@ -327,3 +489,13 @@ nkc-erp/
 - [ ] Deploy and verify login works
 - [ ] Change default seed passwords
 - [ ] Set up keep-alive cron to prevent Supabase pausing
+
+### Mobile App (Expo / EAS)
+- [ ] Install EAS CLI and login (`eas login`)
+- [ ] Initialize EAS project (`eas init` in `apps/mobile`)
+- [ ] Configure `eas.json` with correct `EXPO_PUBLIC_API_URL`
+- [ ] Build preview APK for Android testing
+- [ ] (Optional) Register iOS devices and build preview IPA
+- [ ] Test mobile app connects to Vercel API
+- [ ] Build production binaries for app store submission
+- [ ] (Optional) Set up EAS Update for OTA updates
