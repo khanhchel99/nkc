@@ -9,7 +9,7 @@ import { apiHandler, json, BadRequestError, NotFoundError } from '@/lib/api-help
  */
 export const GET = apiHandler(async (request: NextRequest, context) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.read');
+  requirePermissions(user, 'shipping.shipments.read');
   const { id } = context!.params;
 
   const shipment = await prisma.shipments.findUnique({ where: { id } });
@@ -31,7 +31,7 @@ export const GET = apiHandler(async (request: NextRequest, context) => {
  */
 export const POST = apiHandler(async (request: NextRequest, context) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.create');
+  requirePermissions(user, 'shipping.shipments.create');
   const { id } = context!.params;
   const body = await request.json();
 

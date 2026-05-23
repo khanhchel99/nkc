@@ -45,15 +45,17 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
   const body = await request.json();
 
-  if (!body.salesOrderId) throw new BadRequestError('salesOrderId is required');
+  // Accept either orderIds (array) or salesOrderId (single string)
+  const salesOrderId = body.salesOrderId || (Array.isArray(body.orderIds) && body.orderIds[0]);
+  if (!salesOrderId) throw new BadRequestError('salesOrderId or orderIds is required');
 
   // Fetch the sales order with lines
   const salesOrder = await prisma.sales_orders.findFirst({
-    where: { id: body.salesOrderId, tenant_id: user.tenantId },
+    where: { id: salesOrderId, tenant_id: user.tenantId },
     include: { sales_order_lines: true },
   });
   if (!salesOrder) throw new NotFoundError('Sales order not found');
-  if (salesOrder.status !== 'confirmed') {
+  if (!['confirmed', 'in_production'].includes(salesOrder.status)) {
     throw new BadRequestError('Sales order must be confirmed before running MRP');
   }
 
@@ -151,7 +153,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const mrpPlan = await prisma.material_requirement_plans.create({
     data: {
       tenant_id: user.tenantId,
-      sales_order_id: body.salesOrderId,
+      sales_order_id: salesOrderId,
       plan_no: planNo,
       status: 'draft',
       planning_date: new Date(),
@@ -185,5 +187,17 @@ export const POST = apiHandler(async (request: NextRequest) => {
     include: { material_requirement_lines: true },
   });
 
-  return json(mrpPlan, 201);
+  // Return shortages in the format the frontend expects
+  const shortages = mrpPlan.material_requirement_lines
+    .filter((l) => l.shortage_qty.gt(0))
+    .map((l) => ({
+      itemId: l.item_id,
+      itemName: l.item_name,
+      required: Number(l.gross_required_qty),
+      available: Number(l.available_qty),
+      shortage: Number(l.shortage_qty),
+      unit: l.uom_code,
+    }));
+
+  return json({ shortages, planId: mrpPlan.id, planNumber: mrpPlan.plan_no }, 201);
 });

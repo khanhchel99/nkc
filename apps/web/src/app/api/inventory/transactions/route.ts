@@ -27,6 +27,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
   const [transactions, total] = await Promise.all([
     prisma.stock_transactions.findMany({
       where,
+      include: { warehouses: true },
       skip,
       take: limit,
       orderBy: { created_at: 'desc' },
@@ -34,7 +35,33 @@ export const GET = apiHandler(async (request: NextRequest) => {
     prisma.stock_transactions.count({ where }),
   ]);
 
-  return json({ data: transactions, total, page, limit, totalPages: Math.ceil(total / limit) });
+  // Resolve item names with a single secondary query
+  const itemIds = [...new Set(transactions.map((t) => t.item_id))];
+  const items = itemIds.length
+    ? await prisma.items.findMany({
+        where: { id: { in: itemIds } },
+        select: { id: true, item_name: true },
+      })
+    : [];
+  const itemMap = new Map(items.map((i) => [i.id, i.item_name]));
+
+  const data = transactions.map((t) => ({
+    transactionId: t.id,
+    transactionNo: t.transaction_no,
+    itemId: t.item_id,
+    itemName: itemMap.get(t.item_id) ?? t.item_id,
+    type: t.transaction_type,
+    quantity: Number(t.quantity),
+    unit: t.uom_code,
+    warehouseId: t.warehouse_id,
+    warehouseName: t.warehouses.warehouse_name,
+    reference: t.ref_id ?? null,
+    refType: t.ref_type,
+    reason: t.reason,
+    createdAt: t.created_at,
+  }));
+
+  return json({ data, total, page, limit, totalPages: Math.ceil(total / limit) });
 });
 
 export const POST = apiHandler(async (request: NextRequest) => {

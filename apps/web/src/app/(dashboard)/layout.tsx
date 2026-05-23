@@ -35,8 +35,14 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Redirect unauthenticated users to login
+  if (typeof window !== 'undefined' && !isAuthenticated) {
+    router.replace('/login');
+    return null;
+  }
 
   function handleLogout() {
     logout();
@@ -61,7 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Link href="/dashboard" className="font-bold text-lg">
             NKC ERP
           </Link>
-          <button className="lg:hidden" onClick={() => setSidebarOpen(false)}>
+          <button className="lg:hidden" aria-label="Đóng menu" onClick={() => setSidebarOpen(false)}>
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -114,7 +120,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="h-16 border-b flex items-center px-6 gap-4 bg-background sticky top-0 z-30">
-          <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <button className="lg:hidden" aria-label="Mở menu" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex-1" />

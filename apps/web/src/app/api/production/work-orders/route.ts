@@ -16,11 +16,15 @@ export const GET = apiHandler(async (request: NextRequest) => {
   const skip = (page - 1) * limit;
   const status = params.get('status');
   const salesOrderId = params.get('salesOrderId');
+  const search = params.get('search');
+  const woNumber = params.get('woNumber');
 
   const where = {
     tenant_id: user.tenantId,
     ...(status && { status }),
     ...(salesOrderId && { sales_order_id: salesOrderId }),
+    ...(woNumber && { work_order_no: woNumber }),
+    ...(search && { work_order_no: { contains: search, mode: 'insensitive' as const } }),
   };
 
   const [orders, total] = await Promise.all([
@@ -34,7 +38,45 @@ export const GET = apiHandler(async (request: NextRequest) => {
     prisma.work_orders.count({ where }),
   ]);
 
-  return json({ data: orders, total, page, limit, totalPages: Math.ceil(total / limit) });
+  // Resolve product names with a single secondary query
+  const productIds = [...new Set(orders.map((o) => o.product_id))];
+  const products = productIds.length
+    ? await prisma.products.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, product_name: true, product_code: true },
+      })
+    : [];
+  const productMap = new Map(products.map((p) => [p.id, p]));
+
+  const data = orders.map((o) => {
+    const steps = o.work_order_steps;
+    const completedSteps = steps.filter((s) => s.status === 'completed').length;
+    const product = productMap.get(o.product_id);
+    return {
+      // camelCase (web)
+      workOrderId: o.id,
+      woNumber: o.work_order_no,
+      productId: o.product_id,
+      productName: product?.product_name ?? o.product_id,
+      productCode: product?.product_code,
+      quantity: Number(o.planned_qty),
+      completedQty: Number(o.completed_qty),
+      status: o.status,
+      currentStep: completedSteps,
+      totalSteps: steps.length,
+      startDate: o.planned_start_at,
+      dueDate: o.planned_end_at,
+      priority: o.priority,
+      // snake_case aliases (mobile compatibility)
+      id: o.id,
+      wo_number: o.work_order_no,
+      planned_qty: Number(o.planned_qty),
+      completed_qty: Number(o.completed_qty),
+      work_order_steps: steps.map((s) => ({ id: s.id, status: s.status })),
+    };
+  });
+
+  return json({ data, total, page, limit, totalPages: Math.ceil(total / limit) });
 });
 
 /**

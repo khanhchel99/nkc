@@ -28,7 +28,19 @@ export const GET = apiHandler(async (request: NextRequest) => {
     prisma.production_plans.count({ where }),
   ]);
 
-  return json({ data: plans, total, page, limit, totalPages: Math.ceil(total / limit) });
+  return json({
+    data: plans.map((p) => ({
+      planId: p.id,
+      planNumber: p.plan_no,
+      status: p.status,
+      startDate: p.start_date ? p.start_date.toISOString() : null,
+      endDate: p.end_date ? p.end_date.toISOString() : null,
+      totalOrders: p.production_plan_lines.length,
+      salesOrderId: p.sales_order_id,
+      notes: p.notes,
+    })),
+    total, page, limit, totalPages: Math.ceil(total / limit)
+  });
 });
 
 /**

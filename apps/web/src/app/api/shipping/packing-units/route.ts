@@ -10,7 +10,7 @@ import { apiHandler, json, getSearchParams, BadRequestError } from '@/lib/api-he
  */
 export const GET = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.read');
+  requirePermissions(user, 'shipping.shipments.read');
   const params = getSearchParams(request);
   const page = params.getNumber('page', 1);
   const limit = params.getNumber('limit', 20);
@@ -43,7 +43,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
  */
 export const POST = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.create');
+  requirePermissions(user, 'shipping.packing.manage');
   const body = await request.json();
 
   if (!body.salesOrderLineId) throw new BadRequestError('salesOrderLineId is required');

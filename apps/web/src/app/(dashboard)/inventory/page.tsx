@@ -69,7 +69,7 @@ export default function InventoryPage() {
 function BalancesTab() {
   const { data, isLoading } = useQuery({
     queryKey: ['stock-balances'],
-    queryFn: () => api.get<{ data: StockBalance[] }>('/api/inventory/balances'),
+    queryFn: () => api.get<{ data: StockBalance[] }>('/api/inventory/stock-balances'),
   });
 
   return (

@@ -17,7 +17,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
  */
 export const GET = apiHandler(async (request: NextRequest, context) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'billing.read');
+  requirePermissions(user, 'billing.invoices.read');
   const { id } = context!.params;
 
   const invoice = await prisma.invoices.findUnique({
@@ -41,7 +41,7 @@ export const GET = apiHandler(async (request: NextRequest, context) => {
  */
 export const PATCH = apiHandler(async (request: NextRequest, context) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'billing.update');
+  requirePermissions(user, 'billing.invoices.manage');
   const { id } = context!.params;
   const body = await request.json();
 

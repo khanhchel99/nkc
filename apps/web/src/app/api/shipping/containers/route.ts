@@ -11,7 +11,7 @@ const VALID_CONTAINER_TYPES = ['20GP', '40GP', '40HQ', 'LCL'];
  */
 export const GET = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.read');
+  requirePermissions(user, 'shipping.shipments.read');
   const params = getSearchParams(request);
   const page = params.getNumber('page', 1);
   const limit = params.getNumber('limit', 20);
@@ -45,7 +45,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
  */
 export const POST = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.create');
+  requirePermissions(user, 'shipping.shipments.create');
   const body = await request.json();
 
   if (!body.containerType) throw new BadRequestError('containerType is required');

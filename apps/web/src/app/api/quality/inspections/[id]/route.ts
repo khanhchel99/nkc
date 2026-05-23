@@ -26,7 +26,55 @@ export const GET = apiHandler(async (request: NextRequest, context) => {
     throw new NotFoundError('Inspection not found');
   }
 
-  return json(inspection);
+  return json({
+    id: inspection.id,
+    inspectionId: inspection.id,
+    inspection_no: inspection.inspection_no,
+    inspectionNumber: inspection.inspection_no,
+    ref_type: inspection.ref_type,
+    ref_id: inspection.ref_id,
+    result: inspection.result,
+    status: inspection.result,
+    inspected_qty: Number(inspection.inspected_qty),
+    passed_qty: Number(inspection.passed_qty),
+    failed_qty: Number(inspection.failed_qty),
+    notes: inspection.notes,
+    inspected_at: inspection.inspected_at,
+    created_at: inspection.created_at,
+    qc_plans: inspection.qc_plans
+      ? {
+          id: inspection.qc_plans.id,
+          plan_name: inspection.qc_plans.qc_plan_name,
+          qc_plan_name: inspection.qc_plans.qc_plan_name,
+          qc_plan_code: inspection.qc_plans.qc_plan_code,
+          qc_checklist_items: inspection.qc_plans.qc_checklist_items.map((item) => ({
+            id: item.id,
+            seq: item.line_no,
+            line_no: item.line_no,
+            check_point: item.item_name,
+            item_name: item.item_name,
+            method: item.check_method,
+            check_method: item.check_method,
+            accept_criteria: item.expected_value,
+            expected_value: item.expected_value,
+            is_required: item.is_required,
+          })),
+        }
+      : null,
+    qc_defects: inspection.qc_defects.map((d) => ({
+      id: d.id,
+      defect_type: d.defect_name,
+      defect_name: d.defect_name,
+      defect_code: d.defect_code,
+      description: d.notes,
+      notes: d.notes,
+      qty: Number(d.defect_qty),
+      defect_qty: Number(d.defect_qty),
+      severity: d.severity,
+      disposition: d.disposition,
+      created_at: d.created_at,
+    })),
+  });
 });
 
 /**

@@ -10,7 +10,7 @@ import { apiHandler, json, getSearchParams, BadRequestError, NotFoundError } fro
  */
 export const GET = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'billing.read');
+  requirePermissions(user, 'billing.invoices.read');
   const params = getSearchParams(request);
   const page = params.getNumber('page', 1);
   const limit = params.getNumber('limit', 20);
@@ -44,7 +44,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
  */
 export const POST = apiHandler(async (request: NextRequest) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'billing.create');
+  requirePermissions(user, 'billing.invoices.create');
   const body = await request.json();
 
   if (!body.customerId) throw new BadRequestError('customerId is required');

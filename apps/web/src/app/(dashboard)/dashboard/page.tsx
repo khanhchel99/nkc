@@ -29,7 +29,7 @@ export default function DashboardPage() {
         const [orders, workOrders, inspections] = await Promise.allSettled([
           api.get<{ data: unknown[]; total: number }>('/api/sales-orders', { status: 'confirmed', limit: 1 }),
           api.get<{ data: unknown[]; total: number }>('/api/production/work-orders', { status: 'in_progress', limit: 1 }),
-          api.get<{ data: unknown[]; total: number }>('/api/quality/inspections', { status: 'pending', limit: 1 }),
+          api.get<{ data: unknown[]; total: number }>('/api/quality/inspections', { result: 'pending', limit: 1 }),
         ]);
         return {
           activeOrders: orders.status === 'fulfilled' ? orders.value.total : 0,

@@ -29,7 +29,49 @@ export const GET = apiHandler(async (request: NextRequest, context) => {
     throw new NotFoundError('Work order not found');
   }
 
-  return json(wo);
+  // Look up product name
+  const product = await prisma.products.findUnique({
+    where: { id: wo.product_id },
+    select: { product_name: true, product_code: true },
+  });
+
+  return json({
+    id: wo.id,
+    workOrderId: wo.id,
+    wo_number: wo.work_order_no,
+    woNumber: wo.work_order_no,
+    productId: wo.product_id,
+    productName: product?.product_name ?? wo.product_id,
+    productCode: product?.product_code,
+    status: wo.status,
+    priority: wo.priority,
+    planned_qty: Number(wo.planned_qty),
+    completed_qty: Number(wo.completed_qty),
+    scrapped_qty: Number(wo.scrapped_qty),
+    plannedStartAt: wo.planned_start_at,
+    plannedEndAt: wo.planned_end_at,
+    actualStartAt: wo.actual_start_at,
+    actualEndAt: wo.actual_end_at,
+    work_order_steps: wo.work_order_steps.map((s) => ({
+      id: s.id,
+      step_no: s.step_no,
+      stepNo: s.step_no,
+      step_name: s.step_name,
+      operation_name: s.step_name, // alias for mobile app compatibility
+      stepCode: s.step_code,
+      status: s.status,
+      planned_qty: Number(s.planned_qty),
+      completed_qty: Number(s.completed_qty),
+      scrapped_qty: Number(s.scrapped_qty),
+      plannedStartAt: s.planned_start_at,
+      plannedEndAt: s.planned_end_at,
+      actualStartAt: s.actual_start_at,
+      actualEndAt: s.actual_end_at,
+      work_order_executions: s.work_order_executions,
+      scrap_logs: s.scrap_logs,
+      downtime_logs: s.downtime_logs,
+    })),
+  });
 });
 
 /**

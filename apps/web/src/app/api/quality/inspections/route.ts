@@ -37,7 +37,66 @@ export const GET = apiHandler(async (request: NextRequest) => {
     prisma.qc_inspections.count({ where }),
   ]);
 
-  return json({ data: inspections, total, page, limit, totalPages: Math.ceil(total / limit) });
+  // Resolve work order numbers for work_order_step refs
+  const woStepIds = inspections
+    .filter((i) => i.ref_type === 'work_order_step')
+    .map((i) => i.ref_id);
+  const woStepMap = new Map<string, string>(); // stepId → work_order_no
+  if (woStepIds.length) {
+    const steps = await prisma.work_order_steps.findMany({
+      where: { id: { in: woStepIds } },
+      select: { id: true, work_order_id: true },
+    });
+    const woIds = [...new Set(steps.map((s) => s.work_order_id))];
+    const wos = await prisma.work_orders.findMany({
+      where: { id: { in: woIds } },
+      select: { id: true, work_order_no: true },
+    });
+    const woNoMap = new Map(wos.map((w) => [w.id, w.work_order_no]));
+    for (const step of steps) {
+      woStepMap.set(step.id, woNoMap.get(step.work_order_id) ?? step.work_order_id);
+    }
+  }
+
+  // Resolve inspector names
+  const inspectorIds = inspections
+    .map((i) => i.inspector_user_id)
+    .filter((id): id is string => id !== null);
+  const inspectorMap = new Map<string, string>();
+  if (inspectorIds.length) {
+    const users = await prisma.users.findMany({
+      where: { id: { in: inspectorIds } },
+      select: { id: true, full_name: true },
+    });
+    for (const u of users) inspectorMap.set(u.id, u.full_name);
+  }
+
+  const data = inspections.map((i) => ({
+    inspectionId: i.id,
+    inspectionNumber: i.inspection_no,
+    workOrderNumber: i.ref_type === 'work_order_step' ? (woStepMap.get(i.ref_id) ?? null) : null,
+    refType: i.ref_type,
+    refId: i.ref_id,
+    status: i.result, // result field maps to status in the UI
+    result: i.result,
+    inspectorName: i.inspector_user_id ? (inspectorMap.get(i.inspector_user_id) ?? null) : null,
+    createdAt: i.created_at,
+    inspectedQty: Number(i.inspected_qty),
+    passedQty: Number(i.passed_qty),
+    failedQty: Number(i.failed_qty),
+    notes: i.notes,
+    // snake_case aliases (mobile compatibility)
+    inspection_no: i.inspection_no,
+    ref_type: i.ref_type,
+    ref_id: i.ref_id,
+    inspected_qty: Number(i.inspected_qty),
+    passed_qty: Number(i.passed_qty),
+    failed_qty: Number(i.failed_qty),
+    inspected_at: i.inspected_at,
+    qc_plans: i.qc_plans ? { plan_name: i.qc_plans.qc_plan_name } : null,
+  }));
+
+  return json({ data, total, page, limit, totalPages: Math.ceil(total / limit) });
 });
 
 /**

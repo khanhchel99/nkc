@@ -59,7 +59,7 @@ export default function OrdersPage() {
           <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}>
             {uploading ? 'Đang tải...' : 'Nhập từ Excel'}
           </Button>
-          <input ref={fileRef} type="file" accept=".xlsx,.xls" onChange={handleImport} className="hidden" />
+          <input ref={fileRef} type="file" accept=".xlsx,.xls" onChange={handleImport} className="hidden" aria-label="Nhập file Excel" />
           <Button onClick={() => router.push('/orders/new')}>Tạo đơn hàng</Button>
         </div>
       </div>

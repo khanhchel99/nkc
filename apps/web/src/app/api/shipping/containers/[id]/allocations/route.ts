@@ -9,7 +9,7 @@ import { apiHandler, json, BadRequestError, NotFoundError } from '@/lib/api-help
  */
 export const POST = apiHandler(async (request: NextRequest, context) => {
   const user = getAuthUser(request);
-  requirePermissions(user, 'shipping.create');
+  requirePermissions(user, 'shipping.packing.manage');
   const { id } = context!.params;
   const body = await request.json();
 

@@ -32,22 +32,30 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json();
   const { tenantId, email, password } = body;
 
-  if (!tenantId || !email || !password) {
-    throw new ApiError('tenantId, email, and password are required', 400);
+  if (!email || !password) {
+    throw new ApiError('email and password are required', 400);
   }
 
-  const user = await prisma.users.findUnique({
-    where: { tenant_id_email: { tenant_id: tenantId, email } },
-    include: {
-      user_roles: {
-        include: {
-          roles: {
-            include: { role_permissions: { include: { permissions: true } } },
-          },
+  const userInclude = {
+    user_roles: {
+      include: {
+        roles: {
+          include: { role_permissions: { include: { permissions: true } } },
         },
       },
     },
-  });
+  };
+
+  // If tenantId provided, look up by tenant+email; otherwise find first active user by email
+  const user = tenantId
+    ? await prisma.users.findUnique({
+        where: { tenant_id_email: { tenant_id: tenantId, email } },
+        include: userInclude,
+      })
+    : await prisma.users.findFirst({
+        where: { email },
+        include: userInclude,
+      });
 
   if (!user || user.status !== 'active') {
     throw new ApiError('Invalid credentials', 401);
@@ -94,6 +102,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     refreshToken,
     expiresIn: 900,
     user: {
+      userId: user.id,
       id: user.id,
       email: user.email,
       fullName: user.full_name,

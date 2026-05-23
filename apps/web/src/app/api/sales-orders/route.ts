@@ -14,7 +14,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
   const [orders, total] = await Promise.all([
     prisma.sales_orders.findMany({
       where: { tenant_id: user.tenantId },
-      include: { sales_order_lines: true },
+      include: { sales_order_lines: { select: { id: true } } },
       skip,
       take: limit,
       orderBy: { created_at: 'desc' },
@@ -22,7 +22,29 @@ export const GET = apiHandler(async (request: NextRequest) => {
     prisma.sales_orders.count({ where: { tenant_id: user.tenantId } }),
   ]);
 
-  return json({ data: orders, total, page, limit, totalPages: Math.ceil(total / limit) });
+  // Resolve customer names with a single secondary query
+  const customerIds = [...new Set(orders.map((o) => o.customer_id))];
+  const customers = customerIds.length
+    ? await prisma.customers.findMany({
+        where: { id: { in: customerIds } },
+        select: { id: true, customer_name: true },
+      })
+    : [];
+  const customerMap = new Map(customers.map((c) => [c.id, c.customer_name]));
+
+  const data = orders.map((o) => ({
+    orderId: o.id,
+    orderNumber: o.order_no,
+    customerName: customerMap.get(o.customer_id) ?? o.customer_id,
+    status: o.status,
+    orderDate: o.order_date,
+    requestedDate: o.requested_etd,
+    totalLines: o.sales_order_lines.length,
+    totalAmount: Number(o.total_amount),
+    priority: o.priority,
+  }));
+
+  return json({ data, total, page, limit, totalPages: Math.ceil(total / limit) });
 });
 
 export const POST = apiHandler(async (request: NextRequest) => {
